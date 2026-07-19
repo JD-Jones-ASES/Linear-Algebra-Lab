@@ -29,6 +29,61 @@ function geometryKey(
   });
 }
 
+const AXIS_LEN = 2.2;
+
+/** Canvas sprite label that always faces the camera (x₁, x₂, x₃). */
+function makeAxisLabel(
+  text: string,
+  color: string,
+): { sprite: THREE.Sprite; texture: THREE.CanvasTexture } {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d')!;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '600 36px ui-monospace, "SF Mono", Menlo, monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // Soft halo for contrast on dark scene
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = 'rgba(12, 16, 23, 0.9)';
+  ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+  ctx.fillStyle = color;
+  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  const mat = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+  });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.55, 0.28, 1);
+  return { sprite, texture };
+}
+
+function addAxisLabels(scene: THREE.Scene): THREE.CanvasTexture[] {
+  // AxesHelper: X red, Y green, Z blue — match label colors
+  const specs: Array<{
+    text: string;
+    color: string;
+    pos: [number, number, number];
+  }> = [
+    { text: 'x₁', color: '#f07178', pos: [AXIS_LEN + 0.25, 0, 0] },
+    { text: 'x₂', color: '#7dcea0', pos: [0, AXIS_LEN + 0.25, 0] },
+    { text: 'x₃', color: '#5dade2', pos: [0, 0, AXIS_LEN + 0.25] },
+  ];
+  const textures: THREE.CanvasTexture[] = [];
+  for (const s of specs) {
+    const { sprite, texture } = makeAxisLabel(s.text, s.color);
+    sprite.position.set(...s.pos);
+    scene.add(sprite);
+    textures.push(texture);
+  }
+  return textures;
+}
+
 /**
  * Interactive 3D vector diagram (Three.js).
  * Float display only — domain math stays in ℚ.
@@ -70,14 +125,15 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
       const dir = new THREE.DirectionalLight(0xffffff, 0.55);
       dir.position.set(5, 8, 3);
       scene.add(dir);
-      scene.add(new THREE.AxesHelper(2.2));
+      scene.add(new THREE.AxesHelper(AXIS_LEN));
+      const axisTextures = addAxisLabels(scene);
 
       const all = [
         ...vectors.map((d) => d.v),
         ...(planeSpan ? planeSpan : []),
       ];
       const maxA = maxAbsEntries(...all) * 1.2;
-      const scale = 2.2 / maxA;
+      const scale = AXIS_LEN / maxA;
 
       if (planeSpan) {
         const [u, v] = planeSpan;
@@ -169,6 +225,7 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
       }
 
       if (disposed) {
+        for (const tex of axisTextures) tex.dispose();
         renderer.dispose();
         controls.dispose();
         return;
@@ -199,6 +256,7 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
         disposed = true;
         cancelAnimationFrame(frame);
         window.removeEventListener('resize', onResize);
+        for (const tex of axisTextures) tex.dispose();
         controls.dispose();
         renderer.dispose();
         el.replaceChildren();
@@ -228,10 +286,22 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
           ref={mountRef}
           data-viz3d="true"
           role="img"
-          aria-label={`3D vector diagram: ${summary}. Drag to orbit.`}
+          aria-label={`3D vector diagram with axes x1, x2, x3: ${summary}. Drag to orbit.`}
         />
       )}
       <ul className="viz-legend">
+        <li>
+          <i style={{ background: '#f07178' }} aria-hidden="true" />
+          x₁
+        </li>
+        <li>
+          <i style={{ background: '#7dcea0' }} aria-hidden="true" />
+          x₂
+        </li>
+        <li>
+          <i style={{ background: '#5dade2' }} aria-hidden="true" />
+          x₃
+        </li>
         {vectors.map((d) => (
           <li key={d.id}>
             <i style={{ background: d.color }} aria-hidden="true" />
@@ -240,7 +310,8 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
         ))}
       </ul>
       <p className="viz-panel__caption">
-        Drag to orbit · scroll to zoom · display float · math stays exact ℚ
+        Axes x₁, x₂, x₃ · drag to orbit · scroll to zoom · display float · math
+        stays exact ℚ
       </p>
     </div>
   );
