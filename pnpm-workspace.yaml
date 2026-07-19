@@ -1,0 +1,3 @@
+# pnpm 11: allow necessary package build scripts
+allowBuilds:
+  esbuild: true

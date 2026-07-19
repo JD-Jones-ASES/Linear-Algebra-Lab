@@ -1,0 +1,88 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { withBase } from '../lib/basePath';
+
+const guide = [
+  {
+    href: '/theorems',
+    title: 'Theorem shelf',
+    body: 'Name-brand labels with deep links into prepared desks.',
+  },
+  {
+    href: '/connect',
+    title: 'Connect',
+    body: 'Multi-stop tours — four subspaces, Ax=b, rank collapse.',
+  },
+  {
+    href: '/glossary',
+    title: 'Glossary',
+    body: 'A–Z terms; “See it” lands on live examples.',
+  },
+  {
+    href: '/theory',
+    title: 'Theory',
+    body: 'Short prose map — not a chapter.',
+  },
+];
+
+const desk = [
+  {
+    href: '/matrix',
+    title: 'Matrix',
+    body: 'A and RREF, pivots vs free columns, rank, det.',
+  },
+  {
+    href: '/spaces',
+    title: 'Spaces',
+    body: 'Four fundamental subspaces — the pedagogical spine.',
+  },
+  {
+    href: '/solve',
+    title: 'Solve',
+    body: 'Ax = b consistency, particular solution, nullspace.',
+  },
+];
+---
+
+<Layout path="/map" title="Map" description="Map of Linear Algebra Lab rooms.">
+  <article class="prose" style="max-width: 48rem">
+    <span class="badge">Orient</span>
+    <h1>Landscape</h1>
+    <p style="color: var(--chalk-dim)">
+      Guide names pictures. Desk computes them. Start at{' '}
+      <a href={withBase('/spaces')}>Spaces</a> if you want the spine first.
+    </p>
+  </article>
+
+  <section class="portal-section" aria-labelledby="guide-map">
+    <div class="portal-section__head">
+      <h2 id="guide-map">Guide</h2>
+    </div>
+    <div class="card-grid">
+      {
+        guide.map((c) => (
+          <a class="card" href={withBase(c.href)}>
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="portal-section" aria-labelledby="desk-map">
+    <div class="portal-section__head">
+      <h2 id="desk-map">Desk</h2>
+    </div>
+    <div class="card-grid">
+      {
+        desk.map((c) => (
+          <a class="card" href={withBase(c.href)}>
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SpacesWorkshop from '../../components/spaces/SpacesWorkshop';
+---
+
+<Layout
+  path="/spaces"
+  title="Four subspaces"
+  description="Four fundamental subspaces of a matrix — C(A), N(A), C(Aᵀ), N(Aᵀ) with bases and identity checks."
+>
+  <SpacesWorkshop client:load />
+</Layout>

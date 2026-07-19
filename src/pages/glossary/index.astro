@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import GlossaryApp from '../../components/connect/GlossaryApp';
+---
+
+<Layout
+  path="/glossary"
+  title="Glossary"
+  description="Glossary of linear algebra terms with deep links into the desks."
+>
+  <GlossaryApp client:load />
+</Layout>

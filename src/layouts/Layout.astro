@@ -1,0 +1,306 @@
+---
+import '../styles/site.css';
+import { withBase } from '../lib/basePath';
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+}
+
+const {
+  title = 'Linear Algebra Lab',
+  description = 'Interactive linear algebra desk — four fundamental subspaces, RREF, Ax=b, theorem shelf, glossary.',
+  path = '/',
+} = Astro.props;
+
+const guideLinks = [
+  { href: '/theorems', label: 'Theorems' },
+  { href: '/connect', label: 'Connect' },
+  { href: '/glossary', label: 'Glossary' },
+  { href: '/theory', label: 'Theory' },
+];
+
+const deskLinks = [
+  { href: '/matrix', label: 'Matrix' },
+  { href: '/spaces', label: 'Spaces' },
+  { href: '/solve', label: 'Solve' },
+];
+
+const orientLinks = [{ href: '/map', label: 'Map' }];
+
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0c1017" />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <title>
+      {
+        title === 'Linear Algebra Lab'
+          ? title
+          : `${title} · Linear Algebra Lab`
+      }
+    </title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+      <nav class="site-nav" aria-label="Primary">
+        <a
+          class="site-nav__brand"
+          href={withBase('/')}
+          aria-current={path === '/' ? 'page' : undefined}
+        >
+          Linear Algebra Lab <span aria-hidden="true">C(A)</span>
+        </a>
+
+        <button
+          type="button"
+          class="site-nav__toggle"
+          aria-expanded="false"
+          aria-controls="site-nav-panel"
+          data-nav-toggle
+        >
+          <span class="site-nav__toggle-bars" aria-hidden="true"></span>
+          <span class="site-nav__toggle-label">Menu</span>
+        </button>
+
+        <div class="site-nav__panel" id="site-nav-panel" data-nav-panel>
+          <div class="site-nav__groups">
+            <div class="site-nav__group" role="group" aria-label="Guide">
+              <span class="site-nav__group-label" id="nav-guide-label">Guide</span>
+              <ul class="site-nav__links" aria-labelledby="nav-guide-label">
+                {
+                  guideLinks.map((l) => (
+                    <li>
+                      <a
+                        href={withBase(l.href)}
+                        aria-current={isActive(l.href) ? 'page' : undefined}
+                      >
+                        {l.label}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+
+            <div class="site-nav__group" role="group" aria-label="Desk">
+              <span class="site-nav__group-label" id="nav-desk-label">Desk</span>
+              <ul class="site-nav__links" aria-labelledby="nav-desk-label">
+                {
+                  deskLinks.map((l) => (
+                    <li>
+                      <a
+                        href={withBase(l.href)}
+                        aria-current={isActive(l.href) ? 'page' : undefined}
+                      >
+                        {l.label}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+
+            <div class="site-nav__group site-nav__group--solo" role="group" aria-label="Orient">
+              <span class="site-nav__group-label" id="nav-orient-label">Orient</span>
+              <ul class="site-nav__links" aria-labelledby="nav-orient-label">
+                {
+                  orientLinks.map((l) => (
+                    <li>
+                      <a
+                        href={withBase(l.href)}
+                        aria-current={isActive(l.href) ? 'page' : undefined}
+                      >
+                        {l.label}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="site-main" id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__grid">
+        <p class="site-footer__brand">
+          <strong>Linear Algebra Lab</strong>
+          <span>Four subspaces · explore the matrix, then name what you saw</span>
+        </p>
+        <nav class="site-footer__nav" aria-label="Footer">
+          <div>
+            <span class="site-footer__heading">Guide</span>
+            <ul>
+              {
+                guideLinks.map((l) => (
+                  <li>
+                    <a href={withBase(l.href)}>{l.label}</a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div>
+            <span class="site-footer__heading">Desk</span>
+            <ul>
+              {
+                deskLinks.map((l) => (
+                  <li>
+                    <a href={withBase(l.href)}>{l.label}</a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div>
+            <span class="site-footer__heading">Orient</span>
+            <ul>
+              <li>
+                <a href={withBase('/map')}>Map</a>
+              </li>
+              <li>
+                <a href={withBase('/glossary')}>Glossary</a>
+              </li>
+              <li>
+                <a href={withBase('/')}>Home</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <p class="site-footer__meta">
+        Linear Algebra Lab v0.1 · MIT · local · verification badges certify the
+        implementation · exact ℚ
+      </p>
+    </footer>
+
+    <script>
+      function setupNav() {
+        const toggle = document.querySelector('[data-nav-toggle]');
+        const panel = document.querySelector('[data-nav-panel]');
+        const main = document.getElementById('main');
+        const footer = document.querySelector('.site-footer');
+        if (!(toggle instanceof HTMLButtonElement) || !(panel instanceof HTMLElement)) return;
+
+        const mq = window.matchMedia('(min-width: 960px)');
+        let open = false;
+
+        const focusableSelector =
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+        const isVisible = (el: HTMLElement) => {
+          if (el.hasAttribute('disabled') || el.getAttribute('aria-hidden') === 'true') {
+            return false;
+          }
+          const style = window.getComputedStyle(el);
+          if (style.display === 'none' || style.visibility === 'hidden') return false;
+          return true;
+        };
+
+        const getTrapTargets = (): HTMLElement[] => {
+          const inPanel = [...panel.querySelectorAll<HTMLElement>(focusableSelector)].filter(
+            isVisible,
+          );
+          return [toggle, ...inPanel];
+        };
+
+        const setBackgroundInert = (inert: boolean) => {
+          if (main instanceof HTMLElement) {
+            if (inert) main.setAttribute('inert', '');
+            else main.removeAttribute('inert');
+          }
+          if (footer instanceof HTMLElement) {
+            if (inert) footer.setAttribute('inert', '');
+            else footer.removeAttribute('inert');
+          }
+        };
+
+        const setOpen = (next: boolean, { restoreFocus = true } = {}) => {
+          if (mq.matches) {
+            open = false;
+            toggle.setAttribute('aria-expanded', 'false');
+            panel.classList.remove('is-open');
+            document.body.classList.remove('nav-open');
+            setBackgroundInert(false);
+            return;
+          }
+
+          open = next;
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          panel.classList.toggle('is-open', open);
+          document.body.classList.toggle('nav-open', open);
+          setBackgroundInert(open);
+
+          if (open) {
+            const targets = getTrapTargets();
+            const firstInPanel = targets.find((el) => el !== toggle) ?? toggle;
+            requestAnimationFrame(() => firstInPanel.focus());
+          } else if (restoreFocus) {
+            toggle.focus();
+          }
+        };
+
+        toggle.addEventListener('click', () => {
+          setOpen(!open);
+        });
+
+        panel.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => setOpen(false, { restoreFocus: false }));
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (!open || mq.matches) return;
+
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            setOpen(false);
+            return;
+          }
+
+          if (e.key !== 'Tab') return;
+
+          const targets = getTrapTargets();
+          if (targets.length === 0) return;
+
+          const first = targets[0]!;
+          const last = targets[targets.length - 1]!;
+          const active = document.activeElement;
+
+          if (e.shiftKey) {
+            if (active === first || (!panel.contains(active as Node) && active !== toggle)) {
+              e.preventDefault();
+              last.focus();
+            }
+          } else if (active === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        });
+
+        const onMq = () => {
+          if (mq.matches) setOpen(false, { restoreFocus: false });
+        };
+        mq.addEventListener('change', onMq);
+      }
+
+      setupNav();
+    </script>
+  </body>
+</html>

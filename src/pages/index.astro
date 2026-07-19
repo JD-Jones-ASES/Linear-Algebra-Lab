@@ -1,0 +1,135 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { withBase } from '../lib/basePath';
+
+const paths = [
+  {
+    href: '/theorems',
+    kicker: '1 · Name it',
+    title: 'Theorem shelf',
+    body: 'Four subspaces, rank–nullity, solvability — sticky notes into the desks.',
+  },
+  {
+    href: '/connect',
+    kicker: '2 · Connect it',
+    title: 'Connections',
+    body: 'Tours: meet the four subspaces, when Ax=b works, what rank-1 collapses.',
+  },
+  {
+    href: '/glossary',
+    kicker: '3 · Look it up',
+    title: 'Glossary',
+    body: 'Column space, RREF, pivot, left nullspace… each term jumps into a live example.',
+  },
+];
+
+const desk = [
+  { href: '/matrix', label: 'Matrix', blurb: 'A, RREF, pivots, rank, det' },
+  { href: '/spaces', label: 'Spaces', blurb: 'Four fundamental subspaces' },
+  { href: '/solve', label: 'Solve', blurb: 'Ax = b · b ∈ C(A)?' },
+];
+---
+
+<Layout
+  path="/"
+  title="Linear Algebra Lab"
+  description="Linear algebra portal: four fundamental subspaces, RREF, Ax=b, theorem shelf, glossary. Exact rationals."
+>
+  <section class="hero">
+    <span class="badge">Linear algebra portal · L1 · exact ℚ</span>
+    <h1>
+      One matrix, four subspaces.<br />
+      <em>Then name what you saw.</em>
+    </h1>
+    <p class="hero__lede">
+      A desk for matrices over the rationals — reduced row echelon form, the{' '}
+      <strong>four fundamental subspaces</strong>, and solving Ax = b. The{' '}
+      <strong>Guide</strong>{' '}names theorems and terms; the <strong>Desk</strong> computes
+      the pictures.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn--primary" href={withBase('/spaces')}>Four subspaces</a>
+      <a class="btn btn--ghost" href={withBase('/matrix')}>Matrix desk</a>
+      <a class="btn btn--ghost" href={withBase('/glossary')}>Glossary</a>
+      <a class="btn btn--ghost" href={withBase('/map')}>Map</a>
+    </div>
+  </section>
+
+  <div class="how-strip" role="region" aria-label="How to use Linear Algebra Lab">
+    <div>
+      <strong>Explore</strong>
+      <span>Open a desk, change presets, read RREF and bases.</span>
+    </div>
+    <div>
+      <strong>Verify</strong>
+      <span>Green badges check identities — implementation cert, not Lean.</span>
+    </div>
+    <div>
+      <strong>Label</strong>
+      <span>Theorem chips and deep links name the picture you already see.</span>
+    </div>
+    <div>
+      <strong>Cross rooms</strong>
+      <span>Connect tours land fully prepared — no extra toggles.</span>
+    </div>
+  </div>
+
+  <section class="portal-section" aria-labelledby="path-heading">
+    <div class="portal-section__head">
+      <h2 id="path-heading">Suggested path</h2>
+      <p>Three guide doors — then drop into any desk room.</p>
+    </div>
+    <div class="card-grid card-grid--path">
+      {
+        paths.map((c) => (
+          <a class="card" href={withBase(c.href)}>
+            <span class="card__kicker">{c.kicker}</span>
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="portal-section" aria-labelledby="desk-heading">
+    <div class="portal-section__head">
+      <h2 id="desk-heading">Desk workshops</h2>
+      <p>Computational rooms. Spaces is the pedagogical spine.</p>
+    </div>
+    <div class="desk-grid">
+      {
+        desk.map((d) => (
+          <a class="desk-tile" href={withBase(d.href)}>
+            <strong>{d.label}</strong>
+            <span>{d.blurb}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="portal-section" aria-labelledby="orient-heading">
+    <div class="portal-section__head">
+      <h2 id="orient-heading">Orient</h2>
+      <p>When you are lost, or want vocabulary without a full tour.</p>
+    </div>
+    <div class="card-grid">
+      <a class="card" href={withBase('/map')}>
+        <span class="card__kicker">Map</span>
+        <h3>Landscape</h3>
+        <p>Guide vs Desk checklist — what each room is for.</p>
+      </a>
+      <a class="card" href={withBase('/theory')}>
+        <span class="card__kicker">Theory</span>
+        <h3>Light prose</h3>
+        <p>How the four subspaces hang together — not a textbook chapter.</p>
+      </a>
+      <a class="card" href={withBase('/glossary')}>
+        <span class="card__kicker">A–Z</span>
+        <h3>Glossary</h3>
+        <p>Terms with “See it” deep links into live examples.</p>
+      </a>
+    </div>
+  </section>
+</Layout>

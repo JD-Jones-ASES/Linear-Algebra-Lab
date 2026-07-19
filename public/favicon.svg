@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#121a24"/>
+  <!-- simplified matrix bracket + A -->
+  <path d="M7 8v16M9 8H7M9 24H7M25 8v16M23 8h2M23 24h2" stroke="#4ecdc4" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M12 22V10h2.1l3.2 7.6L20.5 10H22.6v12h-2.05v-7.4L17.2 22h-1.5l-3.35-7.4V22H12z" fill="#e8b84a"/>
+</svg>

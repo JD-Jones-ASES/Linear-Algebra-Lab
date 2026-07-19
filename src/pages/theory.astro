@@ -1,0 +1,74 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { withBase } from '../lib/basePath';
+---
+
+<Layout
+  path="/theory"
+  title="Theory"
+  description="Light theory notes for Linear Algebra Lab — four subspaces architecture."
+>
+  <article class="prose">
+    <span class="badge">Guide · light prose</span>
+    <h1>How the pieces hang together</h1>
+    <p>
+      This is not a textbook. It is a map of what the desks already show.
+    </p>
+
+    <h2>One matrix, four subspaces</h2>
+    <p>
+      An m×n matrix A is a linear map ℚⁿ → ℚᵐ. It carves four subspaces:
+    </p>
+    <ul>
+      <li>
+        <strong>C(A)</strong> — column space in ℚᵐ (all outputs A x)
+      </li>
+      <li>
+        <strong>N(A)</strong> — nullspace in ℚⁿ (inputs sent to 0)
+      </li>
+      <li>
+        <strong>C(Aᵀ)</strong> — row space in ℚⁿ
+      </li>
+      <li>
+        <strong>N(Aᵀ)</strong> — left nullspace in ℚᵐ
+      </li>
+    </ul>
+    <p>
+      If rank(A) = r, the dimensions are r, n−r, r, m−r. That packing is the{' '}
+      <a href={withBase('/theorems#four-subspaces')}>four fundamental subspaces</a>{' '}
+      story (Strang’s framing).
+    </p>
+
+    <h2>RREF is bookkeeping</h2>
+    <p>
+      Reduced row echelon form does not invent new geometry — it renames variables
+      so pivots and free columns are obvious. Pivot columns of A form a basis for
+      C(A). Free columns build a basis for N(A). See the{' '}
+      <a href={withBase('/matrix')}>matrix desk</a>.
+    </p>
+
+    <h2>Solvability is membership</h2>
+    <p>
+      Ax = b has a solution exactly when b lies in C(A). When it does, solutions
+      form an affine translate of N(A). The{' '}
+      <a href={withBase('/solve')}>solve desk</a> makes that binary choice visible.
+    </p>
+
+    <h2>Orthogonal pairs</h2>
+    <p>
+      Over ℚ with the ordinary dot product, C(A) is orthogonal to N(Aᵀ), and C(Aᵀ)
+      is orthogonal to N(A). The spaces desk runs those checks as green badges —
+      implementation certificates, not formal proofs.
+    </p>
+
+    <h2>Scope</h2>
+    <p>
+      Exact rationals only in v0.1. Small matrices (catalog presets). No floating
+      eigenvalues yet, no infinite-dimensional spaces, no formal proof assistant.
+    </p>
+
+    <p>
+      <a href={withBase('/spaces')}>Open the four subspaces desk →</a>
+    </p>
+  </article>
+</Layout>

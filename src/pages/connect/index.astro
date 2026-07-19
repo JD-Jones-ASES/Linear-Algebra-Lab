@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ConnectionsTour from '../../components/connect/ConnectionsTour';
+---
+
+<Layout
+  path="/connect"
+  title="Connect"
+  description="Connection tours across Linear Algebra Lab desks."
+>
+  <ConnectionsTour client:load />
+</Layout>

@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TheoremShelf from '../../components/theorems/TheoremShelf';
+---
+
+<Layout
+  path="/theorems"
+  title="Theorems"
+  description="Theorem shelf for linear algebra — four subspaces, rank–nullity, solvability."
+>
+  <TheoremShelf client:load />
+</Layout>
