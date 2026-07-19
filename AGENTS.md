@@ -56,10 +56,11 @@ pnpm preview
 - Verification badges certify the **implementation** (rank–nullity identities, subspace membership), not a proof assistant.
 - Keep matrix UI comfortable for small sizes (e.g. m,n ≤ 6 for interactive desks).
 
-## GitHub Pages (when public)
+## GitHub Pages
 
+- Live: `https://jd-jones-ases.github.io/Linear-Algebra-Lab/`
 - Data hrefs stay root-app (`/spaces?preset=…`); call `withBase()` from `src/lib/basePath.ts` when rendering `<a href>`.
-- Deploy would set `ASTRO_BASE=/Linear-Algebra-Lab`.
+- Deploy sets `ASTRO_BASE=/Linear-Algebra-Lab` (see `.github/workflows/pages.yml`).
 
 ## Related
 
@@ -79,4 +80,4 @@ Brain pattern: `Grok-Brain/Docs/portal-pattern.md` · sibling: Algebra Lab.
 - Shareable matrices: `?A=1,2;3,4` (see `urlMatrix.ts`).
 - Eigen: only ℚ eigenvalues for n≤3; incomplete splits are labeled honestly.
 - Basis: P columns = basis; Gram–Schmidt on columns; optional T for [T]_B.
-- Private GitHub by default; Pages only when JD approves.
+- Public repo + GitHub Pages (Actions workflow).

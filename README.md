@@ -4,7 +4,7 @@
 
 > Explore the matrix, then name the subspaces.
 
-**Repo (private until public cut):** [JD-Jones-ASES/Linear-Algebra-Lab](https://github.com/JD-Jones-ASES/Linear-Algebra-Lab)
+**Live site:** [https://jd-jones-ases.github.io/Linear-Algebra-Lab/](https://jd-jones-ases.github.io/Linear-Algebra-Lab/)
 
 Sibling to [Algebra Lab](https://github.com/JD-Jones-ASES/Algebra-Lab).
 
@@ -34,6 +34,8 @@ Guide: Theorems · Connect · Glossary · Theory · Map
 pnpm install && pnpm dev
 pnpm test && pnpm test:e2e && pnpm build
 ```
+
+Pages deploy sets `ASTRO_BASE=/Linear-Algebra-Lab` (see `.github/workflows/pages.yml`).
 
 ## Scope
 

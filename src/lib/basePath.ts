@@ -1,8 +1,8 @@
 /**
- * Site base path for GitHub Pages project sites (e.g. `/Algebra-Lab/`).
+ * Site base path for GitHub Pages project sites (e.g. `/Linear-Algebra-Lab/`).
  * Locally and in e2e, base is `/`.
  *
- * Keep data hrefs as root-app paths (`/homs?preset=…`); call `withBase` only
+ * Keep data hrefs as root-app paths (`/spaces?preset=…`); call `withBase` only
  * when rendering `<a href>`.
  */
 
@@ -14,8 +14,8 @@ export function siteBase(): string {
 
 /**
  * Prefix an in-app path with the deploy base.
- * - `withBase('/homs?x=1')` → `/Algebra-Lab/homs?x=1` (on Pages)
- * - `withBase('#eat-x')` stays a fragment
+ * - `withBase('/spaces?x=1')` → `/Linear-Algebra-Lab/spaces?x=1` (on Pages)
+ * - `withBase('#four-subspaces')` stays a fragment
  * - external `https://…` URLs pass through
  */
 export function withBase(path: string): string {

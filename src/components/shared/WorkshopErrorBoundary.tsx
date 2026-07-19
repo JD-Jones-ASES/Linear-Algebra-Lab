@@ -1,4 +1,5 @@
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
+import { withBase } from '../../lib/basePath';
 
 interface Props {
   children: ReactNode;
@@ -45,10 +46,10 @@ export class WorkshopErrorBoundary extends Component<Props, State> {
               >
                 Try again
               </button>
-              <a className="tab-btn" href="/">
+              <a className="tab-btn" href={withBase('/')}>
                 Home
               </a>
-              <a className="tab-btn" href="/map">
+              <a className="tab-btn" href={withBase('/map')}>
                 Map
               </a>
             </div>
