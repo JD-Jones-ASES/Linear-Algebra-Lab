@@ -151,3 +151,56 @@ describe('matrix ops', () => {
 function rowsMatch(A: ReturnType<typeof fromNumbers>, B: ReturnType<typeof fromNumbers>) {
   return A.every((row, i) => row.every((x, j) => eq(x, B[i]![j]!)));
 }
+
+import { project } from './project';
+import { stringsToMatrix } from './matrixSource';
+
+describe('project / least squares', () => {
+  it('residual in left nullspace for singular system', () => {
+    const A = fromNumbers([
+      [1, 2],
+      [2, 4],
+    ]);
+    const b = [frac(1), frac(0)];
+    const pr = project(A, b);
+    expect(pr.checks.allPass).toBe(true);
+    expect(pr.bInColumnSpace).toBe(false);
+    expect(pr.residual.some((c) => c.n !== 0)).toBe(true);
+  });
+
+  it('when b in C(A), residual is zero', () => {
+    const A = fromNumbers([
+      [1, 2],
+      [2, 4],
+    ]);
+    const b = [frac(2), frac(4)]; // 2 * col0
+    const pr = project(A, b);
+    expect(pr.bInColumnSpace).toBe(true);
+    expect(pr.residual.every((c) => c.n === 0)).toBe(true);
+    expect(pr.checks.allPass).toBe(true);
+  });
+
+  it('tall matrix projection checks pass', () => {
+    const A = presetById('tall')!.matrix;
+    const b = [frac(1), frac(0), frac(0)];
+    const pr = project(A, b);
+    expect(pr.checks.residualLeftNull).toBe(true);
+    expect(pr.checks.projectionInCol).toBe(true);
+  });
+});
+
+describe('matrixSource parse', () => {
+  it('parses fraction grid', () => {
+    const A = stringsToMatrix([
+      ['1', '1/2'],
+      ['-1', '0'],
+    ]);
+    expect(A).not.toBeNull();
+    expect(A![0]![1]!.n).toBe(1);
+    expect(A![0]![1]!.d).toBe(2);
+  });
+
+  it('rejects garbage', () => {
+    expect(stringsToMatrix([['1.5', '0']])).toBeNull();
+  });
+});

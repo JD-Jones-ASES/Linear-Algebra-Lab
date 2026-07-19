@@ -100,6 +100,37 @@ export const TOURS: Tour[] = [
       },
     ],
   },
+,
+
+  {
+    id: 'projection-picture',
+    title: 'Projection and residual',
+    blurb:
+      'When Ax = b has no exact solution, the Project desk finds the nearest p in C(A). The leftover r lives in N(Aᵀ).',
+    stops: [
+      {
+        href: `/solve?preset=singular&b=out&note=${note(
+          'Inconsistent: b is not in C(A).',
+        )}`,
+        label: 'Solve · inconsistent',
+        lookAt: 'inconsistent badge',
+      },
+      {
+        href: `/project?preset=singular&b=out&thm=projection&note=${note(
+          'Same A and b-class: projection p and residual r with Aᵀr = 0.',
+        )}`,
+        label: 'Project · residual',
+        lookAt: 'p, r, geometry',
+      },
+      {
+        href: `/spaces?preset=singular&focus=leftNull&note=${note(
+          'Left nullspace direction matches the residual line.',
+        )}`,
+        label: 'Spaces · N(Aᵀ)',
+        lookAt: 'left null basis',
+      },
+    ],
+  },
 ];
 
 export function tourById(id: string | null | undefined): Tour | null {

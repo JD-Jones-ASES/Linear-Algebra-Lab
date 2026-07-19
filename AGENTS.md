@@ -46,7 +46,7 @@ pnpm preview
 ## Information architecture
 
 - **Guide:** Theorems, Connect, Glossary, Theory
-- **Desk:** Matrix, Spaces (four subspaces), Solve (Ax = b)
+- **Desk:** Matrix, Spaces (four subspaces), Solve (Ax = b), Project (least squares)
 - **Orient:** Map (`/map`), Home
 
 ## Domain notes
@@ -64,3 +64,11 @@ pnpm preview
 ## Related
 
 Brain pattern: `Grok-Brain/Docs/portal-pattern.md` · sibling: Algebra Lab.
+
+
+## v0.2 notes
+
+- Editable matrices: exact fractions only; max 5×5; Clear zeros and commits.
+- Project desk: normal equations over ℚ; residual must satisfy Aᵀr = 0.
+- Viz: SVG for ℝ², Three.js for ℝ³; float for pixels only — never for verify badges.
+- Custom matrices are session-local; tours keep `?preset=`.

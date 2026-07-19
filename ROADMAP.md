@@ -1,27 +1,28 @@
 # Roadmap
 
-## Shipped (v0.1)
+## Shipped
 
-- [x] Portal shell (Guide / Desk / Orient) matching Algebra Lab pattern
-- [x] Exact ℚ arithmetic + matrices + RREF + det
-- [x] Four fundamental subspaces with bases and identity checks
-- [x] Solve Ax = b (consistency, particular, nullspace)
-- [x] Matrix desk (A / RREF / both, pivots & free columns)
-- [x] Theorem shelf + connect tours + glossary (from day one)
-- [x] Vitest domain suite + Playwright smoke
-- [x] Local git
+### v0.1
+- Portal shell, exact ℚ, four subspaces, solve, guide, tests
 
-## Next (v0.2 candidates)
+### v0.2
+- [x] Editable matrices (ℚ, ≤5×5)
+- [x] Project / least squares desk (normal equations)
+- [x] 2D SVG vector diagrams
+- [x] 3D Three.js diagrams (orbit)
+- [x] Projection theorems + glossary + tour
+- [x] Column / residual geometry on Matrix, Spaces, Solve, Project
 
-- [ ] Editable matrix cells (type fractions, recompute)
-- [ ] Change-of-basis / coordinate desk
-- [ ] Least squares / projections (still exact where possible)
-- [ ] Eigenvalues for small matrices over ℚ when characteristic poly splits
-- [ ] More Strang-style catalog examples + worked banners
-- [ ] Playwright coverage for deep-link landings
+## Next (v0.3 candidates)
+
+- [ ] Change-of-basis / coordinates desk
+- [ ] Gram–Schmidt / orthonormal bases
+- [ ] Eigen for small matrices over ℚ when char poly splits
+- [ ] URL-encoded custom matrices for shareable deep links
+- [ ] Affine solution-set geometry (xₚ + N(A))
 
 ## Later / optional
 
-- [ ] Float ℝ mode with residual tolerances (labeled, not mixed with exact)
-- [ ] Finite-field matrices (link story to Algebra Lab)
+- [ ] Labeled float ℝ mode (residuals / SVD lite)
+- [ ] Finite-field matrices (Algebra Lab cross-link)
 - [ ] GitHub remote + Pages when JD approves

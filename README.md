@@ -1,6 +1,6 @@
 # Linear Algebra Lab
 
-**v0.1.0** · Interactive desk for **linear algebra over exact rationals ℚ** — matrices, RREF, the **four fundamental subspaces**, solving Ax = b, with a theorem shelf, connection tours, and a glossary.
+**v0.2.0** · Interactive desk for **linear algebra over exact rationals ℚ** — editable matrices, RREF, the **four fundamental subspaces**, solving Ax = b, **orthogonal projection / least squares**, with **2D SVG and 3D (Three.js)** pictures when ambient dimension is 2 or 3.
 
 > Explore the matrix, then name the subspaces.
 
@@ -11,30 +11,27 @@ Sibling portal to [Algebra Lab](https://github.com/JD-Jones-ASES/Algebra-Lab). S
 | Area | Route | Highlights |
 |------|-------|------------|
 | **Home** | `/` | Portal hub — Guide vs Desk |
-| **Theorem shelf** | `/theorems` | Four subspaces, rank–nullity, FTLA, solvability, pivots |
-| **Connect** | `/connect` | Tours across rooms with prepared deep links |
-| **Glossary** | `/glossary` | A–Z terms with “See it” deep links |
-| **Matrix** | `/matrix` | A / RREF / both, pivots vs free columns, rank, det |
-| **Spaces** | `/spaces` | C(A), N(A), C(Aᵀ), N(Aᵀ) bases + identity checks |
-| **Solve** | `/solve` | Ax = b consistency, particular + nullspace |
+| **Theorem shelf** | `/theorems` | Four subspaces, rank–nullity, projection, normal equations |
+| **Connect** | `/connect` | Tours with prepared deep links |
+| **Glossary** | `/glossary` | A–Z with “See it” deep links |
+| **Matrix** | `/matrix` | Edit ℚ matrices, RREF, pivots, column vectors viz |
+| **Spaces** | `/spaces` | C(A), N(A), C(Aᵀ), N(Aᵀ) + codomain picture |
+| **Solve** | `/solve` | Ax = b exact consistency |
+| **Project** | `/project` | Least squares, p ∈ C(A), r ∈ N(Aᵀ), 2D/3D geometry |
 | **Map / Theory** | `/map`, `/theory` | Landscape + light prose |
 
-Deep links (`?preset=`, `?focus=`, `?tab=`, `?b=`, `?thm=`, `?note=`, `?tag=`) land fully prepared. Amber banners state what you should already see.
+Deep links (`?preset=`, `?focus=`, `?tab=`, `?b=`, `?thm=`, `?note=`, `?tag=`) land fully prepared.
 
 ## Stack
 
-- [Astro](https://astro.build) + React islands + TypeScript
-- Pure domain math under `src/lib/linalg/` (no UI imports)
-- Pedagogy data under `src/lib/connect/`
-- Vitest (unit) + Playwright (smoke e2e)
+- Astro + React islands + TypeScript
+- Pure domain under `src/lib/linalg/` (exact ℚ)
+- Pedagogy under `src/lib/connect/`
+- Viz: SVG 2D + Three.js 3D (display float only)
+- Vitest + Playwright
 - pnpm
 
-**Level:** L1 simple personal app — static, client-only, no backend.
-
-## Requirements
-
-- Node.js ≥ 22.12
-- pnpm
+**Level:** L1 static client-only site.
 
 ## Run
 
@@ -45,41 +42,24 @@ pnpm dev
 ```
 
 ```bash
-pnpm test        # Vitest (domain math)
-pnpm test:e2e    # Playwright smoke
+pnpm test
+pnpm test:e2e
 pnpm build
-pnpm preview
 ```
-
-## Project layout
-
-| Path | Role |
-|------|------|
-| `src/lib/linalg/` | Exact ℚ matrices, RREF, four subspaces, solve |
-| `src/lib/connect/` | Tours, theorems, glossary, deep-link helpers |
-| `src/components/*/` | Workshops, shelf, shared UI |
-| `e2e/` | Playwright smoke tests |
-| `AGENTS.md` | Conventions for coding agents |
 
 ## Pedagogy spine
 
-**Four fundamental subspaces** (Strang):
+**Four fundamental subspaces** (Strang): dims r, n−r, r, m−r.  
+**Projection:** b = p + r with p ∈ C(A), r ∈ N(Aᵀ).
 
-| Symbol | Name | Ambient | dim |
-|--------|------|---------|-----|
-| C(A) | Column space | ℚᵐ | r |
-| N(A) | Nullspace | ℚⁿ | n − r |
-| C(Aᵀ) | Row space | ℚⁿ | r |
-| N(Aᵀ) | Left nullspace | ℚᵐ | m − r |
+Verification badges certify the **implementation**, not a proof assistant. Drawings use float scale; algebra stays exact ℚ.
 
-Verification badges certify the **implementation** (rank–nullity, orthogonality, kernel membership), not a formal proof assistant.
+## Scope (v0.2)
 
-## Scope limits (v0.1)
-
-- Exact rationals only (no float ℝ/ℂ yet)
-- Catalog presets; small m, n
-- No eigenvalues / SVD / least squares yet
-- Unicode math in the UI — never raw LaTeX
+- Exact fractions only in editors (no decimals)
+- Editable size ≤ 5×5
+- Viz for ambient dim 2 and 3
+- Custom matrices are session-local (tours use presets)
 - Local git only until JD wants a remote
 
 ## Credits

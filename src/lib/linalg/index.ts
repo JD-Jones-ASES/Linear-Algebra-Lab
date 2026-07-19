@@ -4,3 +4,6 @@ export * from './rref';
 export * from './subspaces';
 export * from './solve';
 export * from './catalog';
+export * from './project';
+export * from './view';
+export * from './matrixSource';

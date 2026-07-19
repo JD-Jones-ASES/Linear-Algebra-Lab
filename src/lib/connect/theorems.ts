@@ -14,7 +14,7 @@ export interface NamedTheorem {
   formal: string;
   why: string;
   lookFor: string;
-  rooms: Array<'matrix' | 'spaces' | 'solve' | 'connect'>;
+  rooms: Array<'matrix' | 'spaces' | 'solve' | 'project' | 'connect'>;
   stops: TheoremStop[];
 }
 
@@ -41,7 +41,7 @@ export const THEOREMS: NamedTheorem[] = [
       },
       {
         href: `/spaces?preset=tall&focus=leftNull&thm=four-subspaces&note=${note(
-          'Tall 3×2: left nullspace dim 1 — dependence among three rows in ℝ² image.',
+          'Tall 3×2: left nullspace dim 1 — dependence among three rows in image of ℝ².',
         )}`,
         label: 'Spaces · tall matrix, left null',
         lookAt: 'N(Aᵀ) highlighted, dim m−r = 1',
@@ -101,7 +101,8 @@ export const THEOREMS: NamedTheorem[] = [
     name: 'Solvability of A x = b',
     formal: 'A x = b has a solution  ⇔  b ∈ C(A)',
     why: 'b must be a combination of the columns. If not, the augmented matrix gains an extra pivot.',
-    lookFor: 'Consistent systems land b in the column space; inconsistent ones show rank[A|b] > rank(A).',
+    lookFor:
+      'Consistent systems land b in the column space; inconsistent ones show rank[A|b] > rank(A).',
     rooms: ['solve', 'spaces'],
     stops: [
       {
@@ -134,6 +135,47 @@ export const THEOREMS: NamedTheorem[] = [
         )}`,
         label: 'Matrix · RREF view',
         lookAt: 'pivot vs free column marks',
+      },
+    ],
+  },
+  {
+    id: 'projection',
+    name: 'Projection theorem',
+    formal: 'b = p + r with p ∈ C(A), r ∈ N(Aᵀ), p ⊥ r',
+    why: 'The closest point of C(A) to b is the orthogonal projection. Least squares solves AᵀA x̂ = Aᵀb so that the residual is perpendicular to every column.',
+    lookFor: 'p in the column space, residual orthogonal (Aᵀr = 0), verify badges green.',
+    rooms: ['project', 'spaces'],
+    stops: [
+      {
+        href: `/project?preset=singular&b=out&thm=projection&note=${note(
+          'b outside C(A): p is the nearest column-space point; r points along N(Aᵀ).',
+        )}`,
+        label: 'Project · singular, b out',
+        lookAt: 'p, r, and Aᵀr = 0',
+      },
+      {
+        href: `/project?preset=tall&b=out&thm=projection&note=${note(
+          'Tall matrix: residual in left nullspace — watch the 3D picture.',
+        )}`,
+        label: 'Project · tall matrix',
+        lookAt: 'geometry panel',
+      },
+    ],
+  },
+  {
+    id: 'normal-eq',
+    name: 'Normal equations',
+    formal: 'Aᵀ A x̂ = Aᵀ b',
+    why: 'Multiplying by Aᵀ turns a possibly inconsistent system into a consistent system whose solution minimizes ‖Ax − b‖.',
+    lookFor: 'Normal matrix AᵀA displayed; AᵀA x̂ = Aᵀb badge green.',
+    rooms: ['project'],
+    stops: [
+      {
+        href: `/project?preset=strang&b=out&thm=normal-eq&note=${note(
+          'Wide matrix: AᵀA is 3×3; LS still yields a unique projection p.',
+        )}`,
+        label: 'Project · Strang 2×3',
+        lookAt: 'AᵀA and x̂',
       },
     ],
   },

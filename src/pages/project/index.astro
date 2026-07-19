@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProjectWorkshop from '../../components/project/ProjectWorkshop';
+---
+
+<Layout
+  path="/project"
+  title="Project"
+  description="Orthogonal projection onto C(A), least squares, residual in N(Aᵀ), 2D/3D geometry."
+>
+  <ProjectWorkshop client:load />
+</Layout>

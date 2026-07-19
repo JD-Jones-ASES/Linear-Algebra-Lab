@@ -17,6 +17,7 @@ test('home and primary nav', async ({ page }) => {
     /matrix/i,
     /spaces/i,
     /solve/i,
+    /project/i,
     /map/i,
   ]) {
     await expect(nav.getByRole('link', { name })).toBeVisible();
@@ -44,7 +45,6 @@ test('glossary lists column space and deep link', async ({ page }) => {
 
 test('glossary topic filter', async ({ page }) => {
   await page.goto('/glossary');
-  // Wait for React island hydration before clicking filters
   await expect(page.locator('[data-glossary-ready="true"]')).toBeVisible();
   const topic = page.getByRole('group', { name: /filter by topic/i });
   const solve = topic.getByRole('button', { name: /^solve$/i });
@@ -67,6 +67,22 @@ test('solve desk consistent path', async ({ page }) => {
   await page.goto('/solve?preset=singular&b=in');
   await expect(page.getByRole('heading', { name: /solve a x = b/i })).toBeVisible();
   await expect(page.getByText('consistent', { exact: true }).first()).toBeVisible();
+});
+
+test('project desk shows residual checks', async ({ page }) => {
+  await page.goto('/project?preset=singular&b=out');
+  await expect(page.getByRole('heading', { name: /project · least squares/i })).toBeVisible();
+  await expect(page.getByText('✓ Aᵀ r = 0')).toBeVisible();
+  await expect(page.getByText('Display scale uses float', { exact: false }).or(page.getByText('drag to orbit', { exact: false })).first()).toBeVisible();
+});
+
+test('matrix editor changes rank', async ({ page }) => {
+  await page.goto('/matrix?preset=id2');
+  await expect(page.locator('[data-rank]')).toHaveAttribute('data-rank', '2');
+  const editor = page.locator('[data-matrix-editor="true"]');
+  await expect(editor).toBeVisible();
+  await editor.getByRole('button', { name: /^clear$/i }).click();
+  await expect(page.locator('[data-rank]')).toHaveAttribute('data-rank', '0');
 });
 
 test('mobile nav opens', async ({ page }) => {

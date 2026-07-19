@@ -3,9 +3,18 @@ import '../shared/workshop.css';
 import { TourBanner } from '../shared/TourBanner';
 import { TheoremChipRow } from '../shared/TheoremChip';
 import { MatrixView, VectorView } from '../shared/MatrixView';
+import { MatrixEditor } from '../shared/MatrixEditor';
 import { clientBannerFromDeepLink, clientParam } from '../../lib/connect/deepLink';
 import { theoremsForRoom } from '../../lib/connect/theorems';
-import { PRESETS, presetById, defaultPreset } from '../../lib/linalg/catalog';
+import {
+  PRESETS,
+  presetById,
+  defaultPreset,
+  type MatrixSource,
+  sourceMatrix,
+  sourceLabel,
+  sourceBlurb,
+} from '../../lib/linalg/matrixSource';
 import {
   fourSubspaces,
   rankNullityLine,
@@ -14,6 +23,8 @@ import {
 } from '../../lib/linalg/subspaces';
 import { formatFrac } from '../../lib/linalg/frac';
 import { withBase } from '../../lib/basePath';
+import type { Matrix } from '../../lib/linalg/matrix';
+import { AmbientViz } from '../viz/AmbientViz';
 
 const FOCUS_IDS: SubspaceId[] = ['col', 'null', 'row', 'leftNull'];
 
@@ -23,20 +34,24 @@ function parseFocus(raw: string | null): SubspaceId | null {
 }
 
 export default function SpacesWorkshop() {
-  const [presetId, setPresetId] = useState(defaultPreset().id);
+  const [source, setSource] = useState<MatrixSource>({
+    kind: 'preset',
+    id: defaultPreset().id,
+  });
   const [focus, setFocus] = useState<SubspaceId | null>(null);
   const [banner, setBanner] = useState(clientBannerFromDeepLink());
 
   useEffect(() => {
     const p = clientParam('preset');
-    if (p && presetById(p)) setPresetId(p);
+    if (p && presetById(p)) setSource({ kind: 'preset', id: p });
     setFocus(parseFocus(clientParam('focus')));
     setBanner(clientBannerFromDeepLink());
   }, []);
 
-  const preset = presetById(presetId) ?? defaultPreset();
-  const fs = useMemo(() => fourSubspaces(preset.matrix), [preset]);
+  const A = useMemo(() => sourceMatrix(source), [source]);
+  const fs = useMemo(() => fourSubspaces(A), [A]);
   const focused = focus ? subspaceById(fs, focus) : null;
+  const label = sourceLabel(source);
 
   const cards: { id: SubspaceId; space: typeof fs.col }[] = [
     { id: 'col', space: fs.col },
@@ -45,13 +60,32 @@ export default function SpacesWorkshop() {
     { id: 'leftNull', space: fs.leftNull },
   ];
 
+  const codomainVecs =
+    fs.m === 2 || fs.m === 3
+      ? [
+          ...fs.col.basis.map((v, i) => ({
+            id: `col${i}`,
+            v,
+            color: '#4ecdc4',
+            label: `C basis ${i + 1}`,
+          })),
+          ...fs.leftNull.basis.map((v, i) => ({
+            id: `ln${i}`,
+            v,
+            color: '#b794f6',
+            label: `N(Aᵀ) ${i + 1}`,
+            dashed: true as const,
+          })),
+        ]
+      : [];
+
   return (
     <div className="workshop">
       <header className="workshop__head">
         <h1>Four fundamental subspaces</h1>
         <p className="workshop__lede">
-          The spine of this lab. One m×n matrix carves four subspaces — dimensions{' '}
-          r, n−r, r, m−r — with orthogonal pairs C(A)⊥N(Aᵀ) and C(Aᵀ)⊥N(A).
+          One m×n matrix carves four subspaces — dimensions r, n−r, r, m−r — with
+          orthogonal pairs C(A)⊥N(Aᵀ) and C(Aᵀ)⊥N(A). Edit A or pick a preset.
         </p>
       </header>
 
@@ -66,15 +100,15 @@ export default function SpacesWorkshop() {
 
       <div className="panel">
         <h2 className="panel__title">Presets</h2>
-        <p className="panel__meta">{preset.blurb}</p>
+        <p className="panel__meta">{sourceBlurb(source)}</p>
         <div className="preset-bar" role="group" aria-label="Matrix presets">
           {PRESETS.map((p) => (
             <button
               key={p.id}
               type="button"
-              className={`preset-chip${p.id === presetId ? ' is-on' : ''}`}
-              aria-pressed={p.id === presetId}
-              onClick={() => setPresetId(p.id)}
+              className={`preset-chip${source.kind === 'preset' && source.id === p.id ? ' is-on' : ''}`}
+              aria-pressed={source.kind === 'preset' && source.id === p.id}
+              onClick={() => setSource({ kind: 'preset', id: p.id })}
             >
               {p.label}
             </button>
@@ -82,14 +116,28 @@ export default function SpacesWorkshop() {
         </div>
       </div>
 
+      <div className="panel">
+        <h2 className="panel__title">Edit matrix · {label}</h2>
+        <MatrixEditor
+          matrix={A}
+          onApply={(M: Matrix) => setSource({ kind: 'custom', matrix: M })}
+          onReset={() =>
+            setSource({
+              kind: 'preset',
+              id: source.kind === 'preset' ? source.id : defaultPreset().id,
+            })
+          }
+        />
+      </div>
+
       <div className="two-col">
         <div className="panel">
           <h2 className="panel__title">Matrix A</h2>
           <MatrixView
-            A={preset.matrix}
+            A={A}
             pivotCols={fs.pivotCols}
             freeCols={fs.freeCols}
-            caption={`${preset.label} · ${fs.m}×${fs.n}`}
+            caption={`${label} · ${fs.m}×${fs.n}`}
           />
           <p className="panel__meta" style={{ marginTop: '0.75rem' }}>
             {rankNullityLine(fs)}
@@ -116,7 +164,7 @@ export default function SpacesWorkshop() {
             </div>
           </div>
           <p className="panel__meta">
-            Expected pattern: r = {fs.rank}, n−r = {fs.n - fs.rank}, r = {fs.rank}, m−r ={' '}
+            Expected: r = {fs.rank}, n−r = {fs.n - fs.rank}, r = {fs.rank}, m−r ={' '}
             {fs.m - fs.rank}
           </p>
           <div className="verify-strip" aria-label="Subspace identity checks">
@@ -129,6 +177,13 @@ export default function SpacesWorkshop() {
           </div>
         </div>
       </div>
+
+      {codomainVecs.length > 0 ? (
+        <div className="panel">
+          <h2 className="panel__title">Codomain picture · C(A) and N(Aᵀ)</h2>
+          <AmbientViz ambient={fs.m} vectors={codomainVecs} A={A} />
+        </div>
+      ) : null}
 
       <div className="space-grid" role="list" aria-label="Four fundamental subspaces">
         {cards.map(({ id, space }) => (
@@ -170,8 +225,7 @@ export default function SpacesWorkshop() {
             Focus · {focused.symbol} — {focused.name}
           </h2>
           <p className="panel__meta">
-            Ambient ℚ{sup(focused.ambient)} · dimension {focused.dimension} · basis size{' '}
-            {focused.basis.length}
+            Ambient ℚ{sup(focused.ambient)} · dimension {focused.dimension}
           </p>
           {focused.basis.length === 0 ? (
             <p className="panel__meta">Only the zero vector.</p>
@@ -187,17 +241,27 @@ export default function SpacesWorkshop() {
         <h2>Where next</h2>
         <ul>
           <li>
-            <a href={withBase(`/matrix?preset=${presetId}&tab=rref`)}>
+            <a
+              href={withBase(
+                source.kind === 'preset'
+                  ? `/matrix?preset=${source.id}&tab=rref`
+                  : '/matrix',
+              )}
+            >
               Matrix RREF
-            </a>{' '}
-            — pivots that built these bases
+            </a>
           </li>
           <li>
-            <a href={withBase(`/solve?preset=${presetId}`)}>Solve A x = b</a> — b ∈ C(A)?
+            <a
+              href={withBase(
+                source.kind === 'preset' ? `/project?preset=${source.id}` : '/project',
+              )}
+            >
+              Project · residual in N(Aᵀ)
+            </a>
           </li>
           <li>
-            <a href={withBase('/theorems#four-subspaces')}>Theorem shelf</a> — name the
-            picture
+            <a href={withBase('/theorems#four-subspaces')}>Theorem shelf</a>
           </li>
         </ul>
       </aside>

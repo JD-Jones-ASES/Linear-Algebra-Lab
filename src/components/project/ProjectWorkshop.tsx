@@ -16,20 +16,26 @@ import {
   sourceBlurb,
 } from '../../lib/linalg/matrixSource';
 import { fourSubspaces } from '../../lib/linalg/subspaces';
-import { solve } from '../../lib/linalg/solve';
-import { type Matrix, type Vector, column, cols, rows } from '../../lib/linalg/matrix';
-import { ONE, ZERO } from '../../lib/linalg/frac';
+import { project } from '../../lib/linalg/project';
+import {
+  type Matrix,
+  type Vector,
+  column,
+  cols,
+  rows,
+} from '../../lib/linalg/matrix';
+import { ONE, ZERO, formatFrac } from '../../lib/linalg/frac';
 import { withBase } from '../../lib/basePath';
 import { AmbientViz } from '../viz/AmbientViz';
 
 type BMode = 'in' | 'out';
 
-export default function SolveWorkshop() {
+export default function ProjectWorkshop() {
   const [source, setSource] = useState<MatrixSource>({
     kind: 'preset',
     id: 'singular',
   });
-  const [bMode, setBMode] = useState<BMode>('in');
+  const [bMode, setBMode] = useState<BMode>('out');
   const [banner, setBanner] = useState(clientBannerFromDeepLink());
 
   useEffect(() => {
@@ -44,7 +50,7 @@ export default function SolveWorkshop() {
   const m = rows(A);
   const n = cols(A);
   const b = useMemo(() => pickB(A, bMode), [A, bMode]);
-  const result = useMemo(() => solve(A, b), [A, b]);
+  const pr = useMemo(() => project(A, b), [A, b]);
   const fs = useMemo(() => fourSubspaces(A), [A]);
   const label = sourceLabel(source);
 
@@ -52,22 +58,30 @@ export default function SolveWorkshop() {
     m === 2 || m === 3
       ? [
           { id: 'b', v: b, color: '#e8b84a', label: 'b' },
-          ...fs.col.basis.map((v, i) => ({
-            id: `c${i}`,
-            v,
+          {
+            id: 'p',
+            v: pr.projection,
             color: '#4ecdc4',
-            label: `a${i + 1}`,
-          })),
+            label: 'p = proj',
+          },
+          {
+            id: 'r',
+            v: pr.residual,
+            color: '#f07178',
+            label: 'r = b−p',
+            dashed: true as const,
+          },
         ]
       : [];
 
   return (
     <div className="workshop">
       <header className="workshop__head">
-        <h1>Solve A x = b</h1>
+        <h1>Project · least squares</h1>
         <p className="workshop__lede">
-          Consistency is a column-space question: b must lie in C(A). When it does,
-          the solution is a particular vector plus the nullspace.
+          Even when A x = b has no solution, there is a closest p ∈ C(A). The
+          residual r = b − p lives in the left nullspace N(Aᵀ). Normal equations:
+          Aᵀ A x̂ = Aᵀ b.
         </p>
       </header>
 
@@ -78,7 +92,7 @@ export default function SolveWorkshop() {
         thmId={banner.thmId}
       />
 
-      <TheoremChipRow theorems={theoremsForRoom('solve')} />
+      <TheoremChipRow theorems={theoremsForRoom('project')} />
 
       <div className="panel">
         <h2 className="panel__title">Matrix A · {label}</h2>
@@ -114,7 +128,7 @@ export default function SolveWorkshop() {
       </div>
 
       <div className="panel">
-        <h2 className="panel__title">Right-hand side b</h2>
+        <h2 className="panel__title">Vector b</h2>
         <div className="tab-bar" role="group" aria-label="Choose b">
           <button
             type="button"
@@ -134,100 +148,108 @@ export default function SolveWorkshop() {
           </button>
         </div>
         <VectorView v={b} label="b" />
-        <p className="panel__meta">
-          dim C(A) = {fs.col.dimension}
-          {fs.col.dimension === m
-            ? ' — full row rank, every b is reachable.'
-            : fs.col.dimension === 0
-              ? ' — only b = 0 is consistent.'
-              : ' — some b land outside the column space.'}
-        </p>
       </div>
 
       <div className="two-col">
         <div className="panel">
-          <h2 className="panel__title">Result</h2>
+          <h2 className="panel__title">Projection algebra</h2>
           <div className="stat-row">
-            <div className={`stat ${result.consistent ? 'stat--teal' : 'stat--rose'}`}>
-              <span className="stat__k">Status</span>
-              <span className="stat__v">
-                {result.consistent ? 'consistent' : 'inconsistent'}
-              </span>
+            <div className={`stat ${pr.bInColumnSpace ? 'stat--teal' : 'stat--amber'}`}>
+              <span className="stat__k">b ∈ C(A)?</span>
+              <span className="stat__v">{pr.bInColumnSpace ? 'yes' : 'no'}</span>
             </div>
             <div className="stat">
-              <span className="stat__k">rank(A)</span>
-              <span className="stat__v">{result.rank}</span>
+              <span className="stat__k">rank</span>
+              <span className="stat__v">{pr.rank}</span>
             </div>
             <div className="stat">
-              <span className="stat__k">rank[A|b]</span>
-              <span className="stat__v">{result.rankAug}</span>
-            </div>
-            <div className="stat">
-              <span className="stat__k">free vars</span>
-              <span className="stat__v">{result.freeCols.length}</span>
+              <span className="stat__k">full col rank</span>
+              <span className="stat__v">{pr.fullColumnRank ? 'yes' : 'no'}</span>
             </div>
           </div>
 
-          {result.consistent && result.particular ? (
-            <>
-              <VectorView v={result.particular} label="particular xₚ" />
-              {result.nullspace.length > 0 ? (
-                <>
-                  <p className="panel__meta">
-                    General solution: x = xₚ + N(A). Nullspace basis:
-                  </p>
-                  {result.nullspace.map((v, i) => (
-                    <VectorView key={i} v={v} label={`n${i + 1}`} />
-                  ))}
-                </>
-              ) : (
-                <p className="panel__meta">Unique solution (trivial nullspace).</p>
-              )}
-            </>
-          ) : (
-            <p className="panel__meta">
-              No solution — b is not a linear combination of the columns.{' '}
-              <a
-                href={withBase(
-                  source.kind === 'preset'
-                    ? `/project?preset=${source.id}&b=out`
-                    : '/project',
-                )}
-              >
-                Project desk
-              </a>{' '}
-              finds the closest p ∈ C(A).
-            </p>
-          )}
+          <VectorView v={pr.hatX} label="x̂ (LS)" />
+          <VectorView v={pr.projection} label="p = A x̂" />
+          <VectorView v={pr.residual} label="r = b − p" />
 
-          <div className="verify-strip">
-            <span
-              className={`verify-badge${
-                result.consistent === (result.rankAug === result.rank)
-                  ? ' is-pass'
-                  : ' is-fail'
-              }`}
-            >
-              consistent ⇔ rank[A|b] = rank(A)
-            </span>
-            {result.consistent ? (
-              <span
-                className={`verify-badge${result.residualZero ? ' is-pass' : ' is-fail'}`}
-              >
-                A xₚ = b
-              </span>
-            ) : null}
+          <p className="panel__meta" style={{ marginTop: '0.65rem' }}>
+            Normal matrix AᵀA ({n}×{n}) · Aᵀb = (
+            {pr.normalRhs.map(formatFrac).join(', ')})
+          </p>
+          <MatrixView A={pr.normalMatrix} caption="Aᵀ A" compact />
+
+          <div className="verify-strip" aria-label="Projection checks">
+            <Badge ok={pr.checks.residualLeftNull} label="Aᵀ r = 0" />
+            <Badge ok={pr.checks.projectionInCol} label="p ∈ C(A)" />
+            <Badge ok={pr.checks.residualOrthoProjection} label="p · r = 0" />
+            <Badge ok={pr.checks.normalSatisfied} label="AᵀA x̂ = Aᵀb" />
           </div>
         </div>
 
-        {viz.length > 0 ? (
-          <div className="panel">
-            <h2 className="panel__title">Geometry · b vs C(A)</h2>
-            <AmbientViz ambient={m} vectors={viz} A={A} />
-          </div>
-        ) : null}
+        <div className="panel">
+          <h2 className="panel__title">Geometry</h2>
+          {viz.length > 0 ? (
+            <AmbientViz
+              ambient={m}
+              vectors={viz}
+              A={A}
+              title={
+                m === 3
+                  ? 'ℝ³ display · drag to orbit'
+                  : 'ℝ² display · C(A) shaded when full'
+              }
+            />
+          ) : (
+            <p className="viz-fallback">
+              Drawings for ambient dim 2 or 3. This matrix has m = {m}.
+            </p>
+          )}
+          <p className="panel__meta">
+            dim C(A) = {fs.col.dimension}, dim N(Aᵀ) = {fs.leftNull.dimension}. Residual
+            direction aligns with left nullspace when r ≠ 0.
+          </p>
+        </div>
       </div>
+
+      <aside className="continue-card">
+        <h2>Where next</h2>
+        <ul>
+          <li>
+            <a
+              href={withBase(
+                source.kind === 'preset'
+                  ? `/spaces?preset=${source.id}&focus=leftNull`
+                  : '/spaces',
+              )}
+            >
+              Left nullspace N(Aᵀ)
+            </a>
+          </li>
+          <li>
+            <a href={withBase('/theorems#projection')}>Projection theorem</a>
+          </li>
+          <li>
+            <a
+              href={withBase(
+                source.kind === 'preset'
+                  ? `/solve?preset=${source.id}&b=${bMode}`
+                  : '/solve',
+              )}
+            >
+              Exact solve desk
+            </a>
+          </li>
+        </ul>
+      </aside>
     </div>
+  );
+}
+
+function Badge({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <span className={`verify-badge${ok ? ' is-pass' : ' is-fail'}`}>
+      {ok ? '✓' : '✗'} {label}
+    </span>
   );
 }
 

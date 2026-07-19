@@ -13,6 +13,7 @@ const TAG_LABEL: Record<GlossaryTag | 'all', string> = {
   matrix: 'Matrix',
   spaces: 'Spaces',
   solve: 'Solve',
+  project: 'Project',
   theorems: 'Theorems',
   general: 'General',
 };
