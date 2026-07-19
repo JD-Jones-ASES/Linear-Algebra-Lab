@@ -38,11 +38,31 @@ test('spaces desk shows four subspace symbols', async ({ page }) => {
   await expect(page.getByText('✓ rank–nullity')).toBeVisible();
 });
 
-test('glossary lists column space and deep link', async ({ page }) => {
+test('glossary catalog renders every term and only real topic chips', async ({
+  page,
+}) => {
+  const { GLOSSARY, GLOSSARY_TAG_ORDER } = await import(
+    '../src/lib/connect/glossary'
+  );
+
+  // Structural guard: TAG_ORDER must be tags only (never nested term objects).
+  expect(GLOSSARY_TAG_ORDER.every((t) => typeof t === 'string')).toBe(true);
+  expect(GLOSSARY.length).toBeGreaterThanOrEqual(30);
+
   await page.goto('/glossary');
+  await expect(page.locator('[data-glossary-ready="true"]')).toBeVisible();
   await expect(page.getByRole('heading', { name: /^glossary$/i })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /^column space$/i })).toBeVisible();
-  await expect(page.getByRole('link', { name: /see it · spaces · c\(a\)/i })).toBeVisible();
+
+  // All + one chip per tag — blank object-chips were the live corruption symptom.
+  const chips = page.locator('.glossary-filters__chips .glossary-filter');
+  await expect(chips).toHaveCount(1 + GLOSSARY_TAG_ORDER.length);
+
+  for (const term of GLOSSARY) {
+    await expect(page.locator(`#${term.id}`)).toBeVisible();
+  }
+  await expect(
+    page.getByRole('link', { name: /see it · spaces · c\(a\)/i }),
+  ).toBeVisible();
 });
 
 test('glossary topic filter', async ({ page }) => {

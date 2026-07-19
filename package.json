@@ -1,7 +1,7 @@
 {
   "name": "linear-algebra-lab",
   "type": "module",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "description": "Interactive linear algebra desk \u2014 four subspaces, projections, basis, eigen, 2D/3D viz",
   "license": "MIT",
@@ -14,6 +14,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -32,6 +33,7 @@
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
     "@types/three": "^0.185.1",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   },
   "repository": {

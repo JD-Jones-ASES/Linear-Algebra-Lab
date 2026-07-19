@@ -100,8 +100,6 @@ export const TOURS: Tour[] = [
       },
     ],
   },
-,
-
   {
     id: 'projection-picture',
     title: 'Projection and residual',
@@ -131,8 +129,6 @@ export const TOURS: Tour[] = [
       },
     ],
   },
-,
-
   {
     id: 'eigen-tour',
     title: 'Meet eigenvalues over ℚ',
