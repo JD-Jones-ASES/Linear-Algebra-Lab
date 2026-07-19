@@ -14,7 +14,7 @@ export interface NamedTheorem {
   formal: string;
   why: string;
   lookFor: string;
-  rooms: Array<'matrix' | 'spaces' | 'solve' | 'project' | 'connect'>;
+  rooms: Array<'matrix' | 'spaces' | 'solve' | 'project' | 'basis' | 'eigen' | 'connect'>;
   stops: TheoremStop[];
 }
 
@@ -176,6 +176,83 @@ export const THEOREMS: NamedTheorem[] = [
         )}`,
         label: 'Project · Strang 2×3',
         lookAt: 'AᵀA and x̂',
+      },
+    ],
+  },
+,
+
+  {
+    id: 'change-of-basis',
+    name: 'Change of basis',
+    formal: '[v]_B = P⁻¹ v ·· [T]_B = P⁻¹ T P',
+    why: 'The same linear map wears different matrix clothes in different bases. Similarity preserves eigenvalues and trace.',
+    lookFor: 'P invertible, P P⁻¹ = I, and tr T = tr [T]_B.',
+    rooms: ['basis'],
+    stops: [
+      {
+        href: `/basis?preset=basis-rot&T=eigen-sym&thm=change-of-basis&note=${note(
+          'P from Integer basis; T symmetric — compare T and [T]_B.',
+        )}`,
+        label: 'Basis · P and [T]_B',
+        lookAt: 'P⁻¹ and similarity trace badge',
+      },
+    ],
+  },
+  {
+    id: 'gram-schmidt',
+    name: 'Gram–Schmidt',
+    formal: 'v_k ↦ u_k orthogonal by subtracting projections',
+    why: 'Builds an orthogonal basis from any spanning list — the algorithm behind QR in exact arithmetic.',
+    lookFor: 'Orthogonal uᵢ with uᵢ · uⱼ = 0 for i ≠ j.',
+    rooms: ['basis'],
+    stops: [
+      {
+        href: `/basis?preset=basis-rot&thm=gram-schmidt&note=${note(
+          'Columns of P run through Gram–Schmidt — check pairwise dots.',
+        )}`,
+        label: 'Basis · Gram–Schmidt',
+        lookAt: 'orthogonal badge',
+      },
+    ],
+  },
+  {
+    id: 'eigenvalue',
+    name: 'Eigenvalue equation',
+    formal: 'A v = λ v with v ≠ 0',
+    why: 'Eigenvectors are directions the map only stretches. Over ℚ we only see eigenvalues that split rationally.',
+    lookFor: 'A v = λ v badges green; eigenlines in the geometry panel.',
+    rooms: ['eigen', 'basis'],
+    stops: [
+      {
+        href: `/eigen?preset=eigen-sym&thm=eigenvalue&note=${note(
+          'λ = 3 and λ = 1 with orthogonal eigenspaces.',
+        )}`,
+        label: 'Eigen · symmetric',
+        lookAt: 'pairs and picture',
+      },
+      {
+        href: `/eigen?preset=eigen-jordan&thm=eigenvalue&note=${note(
+          'Jordan block: alg mult 2, geo mult 1.',
+        )}`,
+        label: 'Eigen · Jordan',
+        lookAt: 'geometric multiplicity',
+      },
+    ],
+  },
+  {
+    id: 'affine-solution',
+    name: 'Affine solution set',
+    formal: 'x = xₚ + N(A) when consistent',
+    why: 'All solutions are a particular solution plus every nullspace vector — an affine translate of N(A).',
+    lookFor: 'Particular xₚ and nullspace directions; free vars match dim.',
+    rooms: ['solve'],
+    stops: [
+      {
+        href: `/solve?preset=strang&b=in&thm=affine-solution&note=${note(
+          'Underdetermined: line of solutions through xₚ along N(A).',
+        )}`,
+        label: 'Solve · free variable',
+        lookAt: 'particular + nullspace',
       },
     ],
   },

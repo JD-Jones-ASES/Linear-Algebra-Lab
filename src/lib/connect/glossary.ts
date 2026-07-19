@@ -93,6 +93,58 @@ export const GLOSSARY_TAG_ORDER: GlossaryTag[] = [
     ],
     tags: ['project', 'theorems'],
   },
+,
+
+  {
+    id: 'eigenvalue',
+    term: 'Eigenvalue',
+    also: ['λ'],
+    def: 'A scalar λ with A v = λ v for some nonzero v. Over ℚ we only list eigenvalues that appear as rational roots of the characteristic polynomial.',
+    see: [
+      {
+        href: `/eigen?preset=eigen-sym&thm=eigenvalue&note=${note('λ = 3 and 1.')}`,
+        label: 'Eigen · symmetric',
+      },
+    ],
+    tags: ['eigen', 'theorems'],
+  },
+  {
+    id: 'eigenvector',
+    term: 'Eigenvector',
+    def: 'A nonzero vector v with A v = λ v. The eigenspace for λ is ker(A − λI).',
+    see: [
+      {
+        href: `/eigen?preset=eigen-diag&note=${note('Axis eigenvectors for a diagonal matrix.')}`,
+        label: 'Eigen · diagonal',
+      },
+    ],
+    tags: ['eigen'],
+  },
+  {
+    id: 'change-of-basis',
+    term: 'Change of basis',
+    also: ['[v]_B'],
+    def: 'Coordinates of v relative to basis B (columns of P) are P⁻¹ v. Matrices of maps transform by similarity.',
+    see: [
+      {
+        href: `/basis?preset=basis-rot&thm=change-of-basis&note=${note('P and P⁻¹.')}`,
+        label: 'Basis desk',
+      },
+    ],
+    tags: ['basis', 'theorems'],
+  },
+  {
+    id: 'gram-schmidt',
+    term: 'Gram–Schmidt',
+    def: 'Algorithm that turns a list of vectors into an orthogonal list by subtracting successive projections.',
+    see: [
+      {
+        href: `/basis?preset=basis-rot&thm=gram-schmidt&note=${note('Orthogonal uᵢ.')}`,
+        label: 'Basis · GS',
+      },
+    ],
+    tags: ['basis'],
+  },
 ];
 
 function note(s: string): string {

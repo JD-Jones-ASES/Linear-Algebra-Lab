@@ -14,6 +14,7 @@ import {
   sourceMatrix,
   sourceLabel,
   sourceBlurb,
+  sourceFromParams,
 } from '../../lib/linalg/matrixSource';
 import {
   fourSubspaces,
@@ -42,8 +43,7 @@ export default function SpacesWorkshop() {
   const [banner, setBanner] = useState(clientBannerFromDeepLink());
 
   useEffect(() => {
-    const p = clientParam('preset');
-    if (p && presetById(p)) setSource({ kind: 'preset', id: p });
+    setSource(sourceFromParams(clientParam('preset'), clientParam('A')));
     setFocus(parseFocus(clientParam('focus')));
     setBanner(clientBannerFromDeepLink());
   }, []);

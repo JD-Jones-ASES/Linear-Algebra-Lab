@@ -204,3 +204,104 @@ describe('matrixSource parse', () => {
     expect(stringsToMatrix([['1.5', '0']])).toBeNull();
   });
 });
+
+import { matInverse } from './inverse';
+import { gramSchmidt } from './gramSchmidt';
+import { changeOfBasis } from './changeOfBasis';
+import { eigen } from './eigen';
+import { encodeMatrix, decodeMatrix } from './urlMatrix';
+import { affineSolution } from './affine';
+import { fromInt } from './frac';
+
+describe('inverse + change of basis', () => {
+  it('inverts full rank 2×2', () => {
+    const A = fromNumbers([
+      [2, 1],
+      [1, 2],
+    ]);
+    const inv = matInverse(A);
+    expect(inv).not.toBeNull();
+    const I = matMul(A, inv!);
+    expect(I[0]![0]!.n).toBe(1);
+    expect(I[1]![1]!.n).toBe(1);
+  });
+
+  it('similarity preserves trace', () => {
+    const P = fromNumbers([
+      [2, 1],
+      [1, 2],
+    ]);
+    const T = fromNumbers([
+      [2, 1],
+      [1, 2],
+    ]);
+    const cob = changeOfBasis(P, T);
+    expect(cob.invertible).toBe(true);
+    expect(cob.checks.allPass).toBe(true);
+  });
+});
+
+describe('gram-schmidt', () => {
+  it('orthogonalizes independent columns', () => {
+    const A = fromNumbers([
+      [1, 1],
+      [0, 1],
+    ]);
+    const gs = gramSchmidt([
+      [fromInt(1), fromInt(0)],
+      [fromInt(1), fromInt(1)],
+    ]);
+    expect(gs.rank).toBe(2);
+    expect(gs.orthogonalChecks).toBe(true);
+  });
+});
+
+describe('eigen', () => {
+  it('finds eigenvalues of diagonal matrix', () => {
+    const A = fromNumbers([
+      [2, 0],
+      [0, 3],
+    ]);
+    const er = eigen(A);
+    expect(er.pairs.length).toBe(2);
+    expect(er.checks.allAvEqualsLambdaV).toBe(true);
+    expect(er.splitsOverQ).toBe(true);
+  });
+
+  it('symmetric 2×2 splits', () => {
+    const A = fromNumbers([
+      [2, 1],
+      [1, 2],
+    ]);
+    const er = eigen(A);
+    expect(er.pairs.length).toBe(2);
+    expect(er.checks.allAvEqualsLambdaV).toBe(true);
+  });
+});
+
+describe('url matrix', () => {
+  it('roundtrips', () => {
+    const A = fromNumbers([
+      [1, 2],
+      [3, 4],
+    ]);
+    const enc = encodeMatrix(A);
+    const B = decodeMatrix(enc);
+    expect(B).not.toBeNull();
+    expect(B![0]![1]!.n).toBe(2);
+  });
+});
+
+describe('affine solution', () => {
+  it('underdetermined system has positive dim', () => {
+    const A = fromNumbers([
+      [1, 2, 3],
+      [0, 1, 1],
+    ]);
+    const b = [fromInt(1), fromInt(1)];
+    const aff = affineSolution(A, b);
+    expect(aff.consistent).toBe(true);
+    expect(aff.dimension).toBe(1);
+    expect(aff.samples.length).toBeGreaterThan(1);
+  });
+});

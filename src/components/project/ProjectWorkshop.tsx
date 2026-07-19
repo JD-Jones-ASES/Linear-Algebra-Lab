@@ -14,6 +14,7 @@ import {
   sourceMatrix,
   sourceLabel,
   sourceBlurb,
+  sourceFromParams,
 } from '../../lib/linalg/matrixSource';
 import { fourSubspaces } from '../../lib/linalg/subspaces';
 import { project } from '../../lib/linalg/project';
@@ -39,8 +40,7 @@ export default function ProjectWorkshop() {
   const [banner, setBanner] = useState(clientBannerFromDeepLink());
 
   useEffect(() => {
-    const p = clientParam('preset');
-    if (p && presetById(p)) setSource({ kind: 'preset', id: p });
+    setSource(sourceFromParams(clientParam('preset'), clientParam('A')));
     const b = clientParam('b');
     if (b === 'in' || b === 'out') setBMode(b);
     setBanner(clientBannerFromDeepLink());

@@ -14,6 +14,7 @@ import {
   sourceMatrix,
   sourceLabel,
   sourceBlurb,
+  sourceFromParams,
 } from '../../lib/linalg/matrixSource';
 import { fourSubspaces } from '../../lib/linalg/subspaces';
 import { det, cols, rows, type Matrix } from '../../lib/linalg/matrix';
@@ -33,8 +34,7 @@ export default function MatrixWorkshop() {
   const [banner, setBanner] = useState(clientBannerFromDeepLink());
 
   useEffect(() => {
-    const p = clientParam('preset');
-    if (p && presetById(p)) setSource({ kind: 'preset', id: p });
+    setSource(sourceFromParams(clientParam('preset'), clientParam('A')));
     const t = clientParam('tab');
     if (t === 'A' || t === 'rref' || t === 'both') setTab(t);
     setBanner(clientBannerFromDeepLink());

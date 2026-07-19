@@ -8,6 +8,7 @@ import {
   cloneMatrix,
 } from './matrix';
 import { PRESETS, defaultPreset, presetById, type MatrixPreset } from './catalog';
+import { decodeMatrix } from './urlMatrix';
 
 export const MAX_EDIT_DIM = 5;
 
@@ -33,7 +34,23 @@ export function sourceBlurb(src: MatrixSource): string {
   if (src.kind === 'preset') {
     return (presetById(src.id) ?? defaultPreset()).blurb;
   }
-  return 'Custom matrix — session only (not in catalog deep links).';
+  return 'Custom matrix — shareable via ?A=… in the URL when you copy the link.';
+}
+
+/**
+ * Resolve matrix source from deep-link params.
+ * Prefer ?A= encoded matrix; else ?preset=.
+ */
+export function sourceFromParams(
+  preset: string | null,
+  encodedA: string | null,
+): MatrixSource {
+  if (encodedA) {
+    const M = decodeMatrix(encodedA);
+    if (M) return { kind: 'custom', matrix: M, label: 'URL matrix' };
+  }
+  if (preset && presetById(preset)) return { kind: 'preset', id: preset };
+  return { kind: 'preset', id: defaultPreset().id };
 }
 
 export function matrixToStrings(A: Matrix): string[][] {

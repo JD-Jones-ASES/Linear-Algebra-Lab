@@ -8,15 +8,15 @@ import { clientBannerFromDeepLink, clientParam } from '../../lib/connect/deepLin
 import { theoremsForRoom } from '../../lib/connect/theorems';
 import {
   PRESETS,
-  presetById,
-  defaultPreset,
   type MatrixSource,
   sourceMatrix,
   sourceLabel,
   sourceBlurb,
+  sourceFromParams,
 } from '../../lib/linalg/matrixSource';
 import { fourSubspaces } from '../../lib/linalg/subspaces';
 import { solve } from '../../lib/linalg/solve';
+import { affineSolution } from '../../lib/linalg/affine';
 import { type Matrix, type Vector, column, cols, rows } from '../../lib/linalg/matrix';
 import { ONE, ZERO } from '../../lib/linalg/frac';
 import { withBase } from '../../lib/basePath';
@@ -33,8 +33,7 @@ export default function SolveWorkshop() {
   const [banner, setBanner] = useState(clientBannerFromDeepLink());
 
   useEffect(() => {
-    const p = clientParam('preset');
-    if (p && presetById(p)) setSource({ kind: 'preset', id: p });
+    setSource(sourceFromParams(clientParam('preset'), clientParam('A')));
     const b = clientParam('b');
     if (b === 'in' || b === 'out') setBMode(b);
     setBanner(clientBannerFromDeepLink());
@@ -45,8 +44,30 @@ export default function SolveWorkshop() {
   const n = cols(A);
   const b = useMemo(() => pickB(A, bMode), [A, bMode]);
   const result = useMemo(() => solve(A, b), [A, b]);
+  const aff = useMemo(() => affineSolution(A, b), [A, b]);
   const fs = useMemo(() => fourSubspaces(A), [A]);
   const label = sourceLabel(source);
+
+  const domainViz = useMemo(() => {
+    if (!aff.consistent || !aff.particular) return [];
+    if (n !== 2 && n !== 3) return [];
+    const vecs = [
+      {
+        id: 'xp',
+        v: aff.particular,
+        color: '#e8b84a',
+        label: 'xₚ',
+      },
+      ...aff.directions.map((d, i) => ({
+        id: `n${i}`,
+        v: d,
+        color: '#f07178',
+        label: `n${i + 1}`,
+        dashed: true as const,
+      })),
+    ];
+    return vecs;
+  }, [aff, n]);
 
   const viz = useMemo(() => {
     if (m !== 2 && m !== 3) return [];
@@ -174,11 +195,16 @@ export default function SolveWorkshop() {
               {result.nullspace.length > 0 ? (
                 <>
                   <p className="panel__meta">
-                    General solution: x = xₚ + N(A). Nullspace basis:
+                    Affine solution set: x = xₚ + N(A) · dim = {aff.dimension}
                   </p>
                   {result.nullspace.map((v, i) => (
                     <VectorView key={i} v={v} label={`n${i + 1}`} />
                   ))}
+                  {aff.samples.length > 1 ? (
+                    <p className="panel__meta">
+                      Samples along first direction: xₚ ± n₁ also solve A x = b.
+                    </p>
+                  ) : null}
                 </>
               ) : (
                 <p className="panel__meta">Unique solution (trivial nullspace).</p>
@@ -227,6 +253,16 @@ export default function SolveWorkshop() {
           </div>
         ) : null}
       </div>
+
+      {domainViz.length > 0 ? (
+        <div className="panel">
+          <h2 className="panel__title">Domain · affine solution set</h2>
+          <p className="panel__meta">
+            xₚ in the domain ℚⁿ with nullspace directions (dashed).
+          </p>
+          <AmbientViz ambient={n} vectors={domainViz} A={null} />
+        </div>
+      ) : null}
     </div>
   );
 }

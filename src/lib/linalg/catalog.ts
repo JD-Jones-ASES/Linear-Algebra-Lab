@@ -133,6 +133,57 @@ export const PRESETS: MatrixPreset[] = [
       [0, 0, 0],
     ],
   ),
+  p(
+    'eigen-diag',
+    'Diag(2,3)',
+    'Diagonal — eigenvalues 2 and 3 on the nose.',
+    ['square', 'full-rank', 'classic'],
+    [
+      [2, 0],
+      [0, 3],
+    ],
+  ),
+  p(
+    'eigen-sym',
+    'Symmetric 2×2',
+    '[[2,1],[1,2]] — eigenvalues 3 and 1, orthogonal eigenspaces.',
+    ['square', 'full-rank', 'classic'],
+    [
+      [2, 1],
+      [1, 2],
+    ],
+  ),
+  p(
+    'eigen-jordan',
+    'Jordan block',
+    '[[1,1],[0,1]] — single eigenvalue 1, geometric mult 1.',
+    ['square', 'full-rank'],
+    [
+      [1, 1],
+      [0, 1],
+    ],
+  ),
+  p(
+    'basis-shear',
+    'Shear basis P',
+    'P = [[1,1],[0,1]] — change-of-basis friendly invertible matrix.',
+    ['square', 'full-rank'],
+    [
+      [1, 1],
+      [0, 1],
+    ],
+  ),
+  p(
+    'basis-rot',
+    'Integer basis',
+    'P = [[2,1],[1,2]] — full rank, good Gram–Schmidt demo.',
+    ['square', 'full-rank', 'classic'],
+    [
+      [2, 1],
+      [1, 2],
+    ],
+  ),
+
 ];
 
 export function presetById(id: string | null | undefined): MatrixPreset | null {

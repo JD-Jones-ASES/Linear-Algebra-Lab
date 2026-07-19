@@ -46,7 +46,7 @@ pnpm preview
 ## Information architecture
 
 - **Guide:** Theorems, Connect, Glossary, Theory
-- **Desk:** Matrix, Spaces (four subspaces), Solve (Ax = b), Project (least squares)
+- **Desk:** Matrix, Spaces, Solve, Project, Basis, Eigen
 - **Orient:** Map (`/map`), Home
 
 ## Domain notes
@@ -72,3 +72,11 @@ Brain pattern: `Grok-Brain/Docs/portal-pattern.md` · sibling: Algebra Lab.
 - Project desk: normal equations over ℚ; residual must satisfy Aᵀr = 0.
 - Viz: SVG for ℝ², Three.js for ℝ³; float for pixels only — never for verify badges.
 - Custom matrices are session-local; tours keep `?preset=`.
+
+
+## v0.3 notes
+
+- Shareable matrices: `?A=1,2;3,4` (see `urlMatrix.ts`).
+- Eigen: only ℚ eigenvalues for n≤3; incomplete splits are labeled honestly.
+- Basis: P columns = basis; Gram–Schmidt on columns; optional T for [T]_B.
+- Private GitHub by default; Pages only when JD approves.

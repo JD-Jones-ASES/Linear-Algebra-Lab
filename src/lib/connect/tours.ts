@@ -131,6 +131,30 @@ export const TOURS: Tour[] = [
       },
     ],
   },
+,
+
+  {
+    id: 'eigen-tour',
+    title: 'Meet eigenvalues over ℚ',
+    blurb: 'Diagonal and symmetric examples split cleanly; a Jordan block shows geometric multiplicity can drop.',
+    stops: [
+      {
+        href: `/eigen?preset=eigen-diag&note=${note('λ = 2 and 3 on the axes.')}`,
+        label: 'Eigen · diagonal',
+        lookAt: 'two eigenpairs',
+      },
+      {
+        href: `/eigen?preset=eigen-sym&thm=eigenvalue&note=${note('Symmetric: orthogonal eigenspaces.')}`,
+        label: 'Eigen · symmetric',
+        lookAt: 'geometry panel',
+      },
+      {
+        href: `/basis?preset=eigen-sym&T=eigen-sym&note=${note('In an eigenbasis, [T]_B is diagonal (up to ordering).')}`,
+        label: 'Basis · diagonalizing',
+        lookAt: '[T]_B',
+      },
+    ],
+  },
 ];
 
 export function tourById(id: string | null | undefined): Tour | null {

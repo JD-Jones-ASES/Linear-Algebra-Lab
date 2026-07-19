@@ -18,6 +18,8 @@ test('home and primary nav', async ({ page }) => {
     /spaces/i,
     /solve/i,
     /project/i,
+    /basis/i,
+    /eigen/i,
     /map/i,
   ]) {
     await expect(nav.getByRole('link', { name })).toBeVisible();
@@ -124,4 +126,25 @@ test('codomain 3d viz stays mounted', async ({ page }) => {
   await expect(wrap.locator('canvas')).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(800);
   await expect(wrap.locator('canvas')).toBeVisible();
+});
+
+
+test('eigen desk shows pairs', async ({ page }) => {
+  await page.goto('/eigen?preset=eigen-sym');
+  await expect(page.getByRole('heading', { name: /^eigen$/i })).toBeVisible();
+  await expect(page.getByText(/λ = /).first()).toBeVisible();
+  await expect(page.getByText('✓ A v = λ v')).toBeVisible();
+});
+
+test('basis desk invertibility', async ({ page }) => {
+  await page.goto('/basis?preset=basis-rot');
+  await expect(page.getByRole('heading', { name: /basis · coordinates/i })).toBeVisible();
+  await expect(page.getByText('yes', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('✓ P P⁻¹ = I')).toBeVisible();
+});
+
+test('url matrix deep link loads', async ({ page }) => {
+  await page.goto('/matrix?A=1,0;0,1');
+  await expect(page.locator('[data-rank]')).toHaveAttribute('data-rank', '2');
+  await expect(page.getByText(/URL matrix|Custom/i).first()).toBeVisible();
 });

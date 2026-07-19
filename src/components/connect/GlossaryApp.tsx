@@ -14,6 +14,8 @@ const TAG_LABEL: Record<GlossaryTag | 'all', string> = {
   spaces: 'Spaces',
   solve: 'Solve',
   project: 'Project',
+  basis: 'Basis',
+  eigen: 'Eigen',
   theorems: 'Theorems',
   general: 'General',
 };
