@@ -40,7 +40,9 @@ export default function EigenWorkshop() {
   const [banner, setBanner] = useState(EMPTY_BANNER);
 
   useEffect(() => {
-    setSource(sourceFromParams(clientParam('preset'), clientParam('A')));
+    setSource(
+      sourceFromParams(clientParam('preset'), clientParam('A'), 'eigen-sym'),
+    );
     setBanner(clientBannerFromDeepLink());
   }, []);
 

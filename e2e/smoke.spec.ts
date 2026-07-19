@@ -143,6 +143,15 @@ test('basis desk invertibility', async ({ page }) => {
   await expect(page.getByText('✓ P P⁻¹ = I')).toBeVisible();
 });
 
+test('basis desk loads without preset query', async ({ page }) => {
+  // Must not crash when deep-link fallback would otherwise use Strang (2×3)
+  await page.goto('/basis');
+  await expect(page.getByRole('heading', { name: /basis · coordinates/i })).toBeVisible();
+  await expect(page.getByText('yes', { exact: true }).first()).toBeVisible();
+  await page.waitForTimeout(500);
+  await expect(page.getByRole('heading', { name: /basis · coordinates/i })).toBeVisible();
+});
+
 test('url matrix deep link loads', async ({ page }) => {
   await page.goto('/matrix?A=1,0;0,1');
   await expect(page.locator('[data-rank]')).toHaveAttribute('data-rank', '2');

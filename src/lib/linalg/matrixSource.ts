@@ -40,17 +40,23 @@ export function sourceBlurb(src: MatrixSource): string {
 /**
  * Resolve matrix source from deep-link params.
  * Prefer ?A= encoded matrix; else ?preset=.
+ * @param fallbackPreset — desk-specific default (do not use Strang on Basis/Eigen).
  */
 export function sourceFromParams(
   preset: string | null,
   encodedA: string | null,
+  fallbackPreset?: string,
 ): MatrixSource {
   if (encodedA) {
     const M = decodeMatrix(encodedA);
     if (M) return { kind: 'custom', matrix: M, label: 'URL matrix' };
   }
   if (preset && presetById(preset)) return { kind: 'preset', id: preset };
-  return { kind: 'preset', id: defaultPreset().id };
+  const fb =
+    fallbackPreset && presetById(fallbackPreset)
+      ? fallbackPreset
+      : defaultPreset().id;
+  return { kind: 'preset', id: fb };
 }
 
 export function matrixToStrings(A: Matrix): string[][] {

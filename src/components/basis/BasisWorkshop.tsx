@@ -36,9 +36,18 @@ export default function BasisWorkshop() {
   const [banner, setBanner] = useState(EMPTY_BANNER);
 
   useEffect(() => {
-    setSource(sourceFromParams(clientParam('preset'), clientParam('A')));
+    // Must not fall back to Strang (2×3) — change-of-basis needs square P
+    setSource(
+      sourceFromParams(clientParam('preset'), clientParam('A'), 'basis-rot'),
+    );
     const tp = clientParam('T');
-    if (tp && presetById(tp)) setMapSource({ kind: 'preset', id: tp });
+    if (tp && presetById(tp)) {
+      setMapSource({ kind: 'preset', id: tp });
+    } else {
+      setMapSource(
+        sourceFromParams(null, null, 'eigen-sym'),
+      );
+    }
     setBanner(clientBannerFromDeepLink());
   }, []);
 
@@ -132,18 +141,25 @@ export default function BasisWorkshop() {
             </div>
             <div className="stat">
               <span className="stat__k">det P</span>
-              <span className="stat__v">{formatFrac(cob.detP)}</span>
+              <span className="stat__v">
+                {cob.square ? formatFrac(cob.detP) : '—'}
+              </span>
             </div>
           </div>
+          {cob.message ? (
+            <p className="panel__meta" role="status">
+              {cob.message}
+            </p>
+          ) : null}
           <MatrixView A={P} caption="P (columns = basis)" />
           {cob.Pinv ? (
             <>
               <div style={{ height: '0.75rem' }} />
               <MatrixView A={cob.Pinv} caption="P⁻¹" />
             </>
-          ) : (
+          ) : cob.square ? (
             <p className="panel__meta">Singular P — not a basis of ℚⁿ.</p>
-          )}
+          ) : null}
           <div className="verify-strip">
             <Badge ok={cob.checks.PPinvIsI} label="P P⁻¹ = I" />
           </div>
