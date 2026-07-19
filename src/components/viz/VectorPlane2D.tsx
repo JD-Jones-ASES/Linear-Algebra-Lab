@@ -52,8 +52,10 @@ export function VectorPlane2D({
   return (
     <div className="viz-panel">
       {title ? <p className="viz-panel__caption">{title}</p> : null}
-      <div className="viz-svg-wrap">
+      <div className="viz-svg-wrap" data-viz2d="true">
         <svg
+          width={W}
+          height={H}
           viewBox={`0 0 ${W} ${H}`}
           role="img"
           aria-label={ariaLabel ?? `2D vector diagram. ${summary}`}

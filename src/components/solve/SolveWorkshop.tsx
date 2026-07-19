@@ -48,18 +48,18 @@ export default function SolveWorkshop() {
   const fs = useMemo(() => fourSubspaces(A), [A]);
   const label = sourceLabel(source);
 
-  const viz =
-    m === 2 || m === 3
-      ? [
-          { id: 'b', v: b, color: '#e8b84a', label: 'b' },
-          ...fs.col.basis.map((v, i) => ({
-            id: `c${i}`,
-            v,
-            color: '#4ecdc4',
-            label: `a${i + 1}`,
-          })),
-        ]
-      : [];
+  const viz = useMemo(() => {
+    if (m !== 2 && m !== 3) return [];
+    return [
+      { id: 'b', v: b, color: '#e8b84a', label: 'b' },
+      ...fs.col.basis.map((v, i) => ({
+        id: `c${i}`,
+        v,
+        color: '#4ecdc4',
+        label: `a${i + 1}`,
+      })),
+    ];
+  }, [m, b, fs]);
 
   return (
     <div className="workshop">

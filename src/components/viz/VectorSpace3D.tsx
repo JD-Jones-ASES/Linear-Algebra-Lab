@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { maxAbsEntries } from '../../lib/linalg/view';
 
 export interface DrawnVec3 {
@@ -16,24 +18,38 @@ interface Props {
   title?: string;
 }
 
+/** Stable content key so parent re-renders with new array identities do not remount Three. */
+function geometryKey(
+  vectors: DrawnVec3[],
+  planeSpan: Props['planeSpan'],
+): string {
+  return JSON.stringify({
+    vectors: vectors.map((d) => [d.id, d.v, d.color, d.label, !!d.dashed]),
+    planeSpan: planeSpan ?? null,
+  });
+}
+
 /**
  * Interactive 3D vector diagram (Three.js).
  * Float display only — domain math stays in ℚ.
+ *
+ * Three is statically imported so Vite does not race dynamic-import optimize-dep 504s.
+ * Effect deps use a content key so unstable parent array identities do not tear down the canvas.
  */
 export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
+  const key = geometryKey(vectors, planeSpan);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
-    let cancelled = false;
-    let cleanup: (() => void) | undefined;
 
-    (async () => {
-      const THREE = await import('three');
-      const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
-      if (cancelled || !mountRef.current) return;
+    setError(null);
+    let frame = 0;
+    let disposed = false;
 
+    try {
       const width = el.clientWidth || 400;
       const height = el.clientHeight || 300;
 
@@ -46,7 +62,6 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(width, height);
-      el.appendChild(renderer.domElement);
 
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
@@ -55,8 +70,6 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
       const dir = new THREE.DirectionalLight(0xffffff, 0.55);
       dir.position.set(5, 8, 3);
       scene.add(dir);
-
-      // axes helper
       scene.add(new THREE.AxesHelper(2.2));
 
       const all = [
@@ -75,38 +88,28 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
         ];
         const clen = Math.hypot(cross[0], cross[1], cross[2]);
         if (clen > 1e-9) {
-          // Build a grid on the plane using u,v orthonormalized-ish for display
           const ul = Math.hypot(...u) || 1;
           const uu = u.map((x) => x / ul) as [number, number, number];
-          let vv = v.map((x, i) => x - uu[i]! * (v[0] * uu[0] + v[1] * uu[1] + v[2] * uu[2])) as [
-            number,
-            number,
-            number,
-          ];
+          let vv = v.map(
+            (x, i) =>
+              x - uu[i]! * (v[0] * uu[0] + v[1] * uu[1] + v[2] * uu[2]),
+          ) as [number, number, number];
           const vl = Math.hypot(...vv) || 1;
           vv = vv.map((x) => x / vl) as [number, number, number];
-          const geo = new THREE.BufferGeometry();
           const s = 1.8;
           const corners = [
             [-s, -s],
             [s, -s],
             [s, s],
             [-s, s],
-          ].map(([a, b]) =>
-            new THREE.Vector3(
-              (uu[0] * a + vv[0] * b) ,
-              (uu[1] * a + vv[1] * b) ,
-              (uu[2] * a + vv[2] * b) ,
-            ),
+          ].map(
+            ([a, b]) =>
+              new THREE.Vector3(
+                uu[0] * a! + vv[0] * b!,
+                uu[1] * a! + vv[1] * b!,
+                uu[2] * a! + vv[2] * b!,
+              ),
           );
-          geo.setFromPoints([corners[0]!, corners[1]!, corners[2]!, corners[0]!, corners[2]!, corners[3]!]);
-          const mat = new THREE.MeshBasicMaterial({
-            color: 0x4ecdc4,
-            transparent: true,
-            opacity: 0.18,
-            side: THREE.DoubleSide,
-          });
-          // Use triangle mesh
           const meshGeo = new THREE.BufferGeometry().setFromPoints([
             corners[0]!,
             corners[1]!,
@@ -116,7 +119,17 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
             corners[3]!,
           ]);
           meshGeo.computeVertexNormals();
-          scene.add(new THREE.Mesh(meshGeo, mat));
+          scene.add(
+            new THREE.Mesh(
+              meshGeo,
+              new THREE.MeshBasicMaterial({
+                color: 0x4ecdc4,
+                transparent: true,
+                opacity: 0.18,
+                side: THREE.DoubleSide,
+              }),
+            ),
+          );
         }
       }
 
@@ -131,15 +144,17 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
         const len = dirV.length();
         if (len < 1e-9) continue;
 
-        const shaft = new THREE.CylinderGeometry(0.025, 0.025, len * 0.88, 8);
         const mat = new THREE.MeshStandardMaterial({ color: d.color });
-        const mesh = new THREE.Mesh(shaft, mat);
-        mesh.position.copy(origin.clone().add(tip).multiplyScalar(0.44));
-        mesh.quaternion.setFromUnitVectors(
+        const shaft = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.025, 0.025, len * 0.88, 8),
+          mat,
+        );
+        shaft.position.copy(origin.clone().add(tip).multiplyScalar(0.44));
+        shaft.quaternion.setFromUnitVectors(
           new THREE.Vector3(0, 1, 0),
           dirV.clone().normalize(),
         );
-        scene.add(mesh);
+        scene.add(shaft);
 
         const cone = new THREE.Mesh(
           new THREE.ConeGeometry(0.07, len * 0.14, 12),
@@ -153,8 +168,17 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
         scene.add(cone);
       }
 
-      let frame = 0;
+      if (disposed) {
+        renderer.dispose();
+        controls.dispose();
+        return;
+      }
+
+      el.replaceChildren();
+      el.appendChild(renderer.domElement);
+
       const animate = () => {
+        if (disposed) return;
         frame = requestAnimationFrame(animate);
         controls.update();
         renderer.render(scene, camera);
@@ -162,43 +186,51 @@ export function VectorSpace3D({ vectors, planeSpan = null, title }: Props) {
       animate();
 
       const onResize = () => {
-        if (!mountRef.current) return;
+        if (disposed || !mountRef.current) return;
         const w = mountRef.current.clientWidth;
         const h = mountRef.current.clientHeight;
-        camera.aspect = w / h;
+        camera.aspect = w / Math.max(h, 1);
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
       };
       window.addEventListener('resize', onResize);
 
-      cleanup = () => {
+      return () => {
+        disposed = true;
         cancelAnimationFrame(frame);
         window.removeEventListener('resize', onResize);
         controls.dispose();
         renderer.dispose();
-        if (renderer.domElement.parentNode === el) {
-          el.removeChild(renderer.domElement);
-        }
+        el.replaceChildren();
       };
-    })();
-
-    return () => {
-      cancelled = true;
-      cleanup?.();
-    };
-  }, [vectors, planeSpan]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      return () => {
+        disposed = true;
+      };
+    }
+    // Content key only — new array identities with same numbers must not remount
+  }, [key]);
 
   const summary = vectors.map((d) => d.label).join(', ');
 
   return (
     <div className="viz-panel">
       {title ? <p className="viz-panel__caption">{title}</p> : null}
-      <div
-        className="viz-3d-wrap"
-        ref={mountRef}
-        role="img"
-        aria-label={`3D vector diagram: ${summary}. Drag to orbit.`}
-      />
+      {error ? (
+        <p className="viz-fallback" role="alert">
+          3D view failed to load: {error}
+        </p>
+      ) : (
+        <div
+          className="viz-3d-wrap"
+          ref={mountRef}
+          data-viz3d="true"
+          role="img"
+          aria-label={`3D vector diagram: ${summary}. Drag to orbit.`}
+        />
+      )}
       <ul className="viz-legend">
         {vectors.map((d) => (
           <li key={d.id}>

@@ -79,9 +79,18 @@ test('project desk shows residual checks', async ({ page }) => {
 test('matrix editor changes rank', async ({ page }) => {
   await page.goto('/matrix?preset=id2');
   await expect(page.locator('[data-rank]')).toHaveAttribute('data-rank', '2');
+  // Wait for React island hydration — fill before ready ignores React state
+  await expect(page.locator('[data-editor-ready="true"]')).toBeVisible();
   const editor = page.locator('[data-matrix-editor="true"]');
-  await expect(editor).toBeVisible();
-  await editor.getByRole('button', { name: /^clear$/i }).click();
+  for (const label of [
+    'Entry row 1 column 1',
+    'Entry row 1 column 2',
+    'Entry row 2 column 1',
+    'Entry row 2 column 2',
+  ]) {
+    await editor.getByLabel(label).fill('0');
+  }
+  await editor.getByRole('button', { name: /^apply$/i }).click();
   await expect(page.locator('[data-rank]')).toHaveAttribute('data-rank', '0');
 });
 
@@ -96,4 +105,23 @@ test('mobile nav opens', async ({ page }) => {
   await expect(nav.getByRole('link', { name: /^theorems$/i })).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(menu).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('codomain 2d viz stays visible', async ({ page }) => {
+  await page.goto('/spaces?preset=strang');
+  const img = page.locator('[data-viz2d="true"] svg');
+  await expect(img).toBeVisible();
+  await page.waitForTimeout(600);
+  await expect(img).toBeVisible();
+  await expect(img).toHaveAttribute('role', 'img');
+});
+
+test('codomain 3d viz stays mounted', async ({ page }) => {
+  await page.goto('/spaces?preset=tall');
+  const wrap = page.locator('[data-viz3d="true"]');
+  await expect(wrap).toBeVisible();
+  // Wait for dynamic three import + paint
+  await expect(wrap.locator('canvas')).toBeVisible({ timeout: 15_000 });
+  await page.waitForTimeout(800);
+  await expect(wrap.locator('canvas')).toBeVisible();
 });

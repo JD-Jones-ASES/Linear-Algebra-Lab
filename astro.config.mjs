@@ -14,4 +14,9 @@ export default defineConfig({
   site: 'https://jd-jones-ases.github.io',
   base,
   integrations: [react()],
+  vite: {
+    optimizeDeps: {
+      include: ['three', 'three/addons/controls/OrbitControls.js'],
+    },
+  },
 });

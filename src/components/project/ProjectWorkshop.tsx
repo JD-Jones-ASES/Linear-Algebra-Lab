@@ -54,25 +54,25 @@ export default function ProjectWorkshop() {
   const fs = useMemo(() => fourSubspaces(A), [A]);
   const label = sourceLabel(source);
 
-  const viz =
-    m === 2 || m === 3
-      ? [
-          { id: 'b', v: b, color: '#e8b84a', label: 'b' },
-          {
-            id: 'p',
-            v: pr.projection,
-            color: '#4ecdc4',
-            label: 'p = proj',
-          },
-          {
-            id: 'r',
-            v: pr.residual,
-            color: '#f07178',
-            label: 'r = b−p',
-            dashed: true as const,
-          },
-        ]
-      : [];
+  const viz = useMemo(() => {
+    if (m !== 2 && m !== 3) return [];
+    return [
+      { id: 'b', v: b, color: '#e8b84a', label: 'b' },
+      {
+        id: 'p',
+        v: pr.projection,
+        color: '#4ecdc4',
+        label: 'p = proj',
+      },
+      {
+        id: 'r',
+        v: pr.residual,
+        color: '#f07178',
+        label: 'r = b−p',
+        dashed: true as const,
+      },
+    ];
+  }, [m, b, pr]);
 
   return (
     <div className="workshop">

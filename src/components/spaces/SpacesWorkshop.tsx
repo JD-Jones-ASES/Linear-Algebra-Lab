@@ -60,24 +60,24 @@ export default function SpacesWorkshop() {
     { id: 'leftNull', space: fs.leftNull },
   ];
 
-  const codomainVecs =
-    fs.m === 2 || fs.m === 3
-      ? [
-          ...fs.col.basis.map((v, i) => ({
-            id: `col${i}`,
-            v,
-            color: '#4ecdc4',
-            label: `C basis ${i + 1}`,
-          })),
-          ...fs.leftNull.basis.map((v, i) => ({
-            id: `ln${i}`,
-            v,
-            color: '#b794f6',
-            label: `N(Aᵀ) ${i + 1}`,
-            dashed: true as const,
-          })),
-        ]
-      : [];
+  const codomainVecs = useMemo(() => {
+    if (fs.m !== 2 && fs.m !== 3) return [];
+    return [
+      ...fs.col.basis.map((v, i) => ({
+        id: `col${i}`,
+        v,
+        color: '#4ecdc4',
+        label: `C basis ${i + 1}`,
+      })),
+      ...fs.leftNull.basis.map((v, i) => ({
+        id: `ln${i}`,
+        v,
+        color: '#b794f6',
+        label: `N(Aᵀ) ${i + 1}`,
+        dashed: true as const,
+      })),
+    ];
+  }, [fs]);
 
   return (
     <div className="workshop">

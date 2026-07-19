@@ -24,11 +24,16 @@ export function MatrixEditor({
 }: Props) {
   const [cells, setCells] = useState(() => matrixToStrings(matrix));
   const [error, setError] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setCells(matrixToStrings(matrix));
     setError(null);
   }, [matrix]);
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
 
   const m = cells.length;
   const n = cells[0]?.length ?? 0;
@@ -58,7 +63,11 @@ export function MatrixEditor({
   };
 
   return (
-    <div className="matrix-editor" data-matrix-editor="true">
+    <div
+      className="matrix-editor"
+      data-matrix-editor="true"
+      data-editor-ready={ready ? 'true' : 'false'}
+    >
       <div className="matrix-editor__toolbar">
         <label className="matrix-editor__dim">
           Rows

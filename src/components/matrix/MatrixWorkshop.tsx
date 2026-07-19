@@ -53,15 +53,15 @@ export default function MatrixWorkshop() {
 
   const pickPreset = (id: string) => setSource({ kind: 'preset', id });
 
-  const colVecs =
-    rows(A) === 2 || rows(A) === 3
-      ? Array.from({ length: Math.min(cols(A), 4) }, (_, j) => ({
-          id: `c${j}`,
-          v: column(A, j),
-          color: ['#4ecdc4', '#e8b84a', '#f07178', '#b794f6'][j % 4]!,
-          label: `a${j + 1}`,
-        }))
-      : [];
+  const colVecs = useMemo(() => {
+    if (rows(A) !== 2 && rows(A) !== 3) return [];
+    return Array.from({ length: Math.min(cols(A), 4) }, (_, j) => ({
+      id: `c${j}`,
+      v: column(A, j),
+      color: ['#4ecdc4', '#e8b84a', '#f07178', '#b794f6'][j % 4]!,
+      label: `a${j + 1}`,
+    }));
+  }, [A]);
 
   return (
     <div className="workshop">
