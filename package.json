@@ -1,7 +1,7 @@
 {
   "name": "linear-algebra-lab",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "Interactive linear algebra desk \u2014 four subspaces, projections, basis, eigen, 2D/3D viz",
   "license": "MIT",

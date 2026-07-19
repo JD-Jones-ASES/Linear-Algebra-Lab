@@ -2,22 +2,17 @@
 
 ## Shipped
 
-### v0.1
-Portal, ℚ core, four subspaces, solve, guide
+### v0.1–v0.3
+Portal through basis/eigen/URL/affine + private GitHub
 
-### v0.2
-Editable matrices, Project/LS, 2D+3D viz
+### v0.3.1 preflight
+- [x] Error boundaries on desks
+- [x] Share / Send-to bars
+- [x] Det as area (2×2) + volume note (3×3)
+- [x] More catalog presets
+- [x] Editable b on Solve & Project
+- [x] e2e: theorem first stops + feature smokes
 
-### v0.3
-- [x] Change-of-basis / coordinates desk (`/basis`)
-- [x] Gram–Schmidt
-- [x] Eigen over ℚ for n≤3 (`/eigen`)
-- [x] URL-encoded custom matrices (`?A=`)
-- [x] Affine solution set on Solve
-- [x] Hardening (tests, CI, private GitHub)
-
-## Next (optional v0.4 / v1)
-
+## Next
 - [ ] Public + GitHub Pages when JD approves
-- [ ] More eigen (n=3 full factoring) / float SVD lite
-- [ ] Finite-field matrices (Algebra Lab link)
+- [ ] Optional: float SVD lite, 𝔽_q matrices

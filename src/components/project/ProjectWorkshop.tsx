@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import '../shared/workshop.css';
+import { WorkshopErrorBoundary } from '../shared/WorkshopErrorBoundary';
 import { TourBanner } from '../shared/TourBanner';
 import { TheoremChipRow } from '../shared/TheoremChip';
 import { MatrixView, VectorView } from '../shared/MatrixView';
 import { MatrixEditor } from '../shared/MatrixEditor';
+import { VectorEditor } from '../shared/VectorEditor';
+import { ShareBar, SendToBar } from '../shared/ShareBar';
 import { clientBannerFromDeepLink, clientParam, EMPTY_BANNER } from '../../lib/connect/deepLink';
 import { theoremsForRoom } from '../../lib/connect/theorems';
 import {
   PRESETS,
-  presetById,
-  defaultPreset,
   type MatrixSource,
   sourceMatrix,
   sourceLabel,
@@ -25,11 +26,24 @@ import {
   cols,
   rows,
 } from '../../lib/linalg/matrix';
-import { ONE, ZERO, formatFrac } from '../../lib/linalg/frac';
+import { ONE, ZERO, formatFrac, parseFrac } from '../../lib/linalg/frac';
 import { withBase } from '../../lib/basePath';
 import { AmbientViz } from '../viz/AmbientViz';
 
-type BMode = 'in' | 'out';
+type BMode = 'in' | 'out' | 'custom';
+
+function parseBParam(raw: string | null, m: number): Vector | null {
+  if (!raw || raw === 'in' || raw === 'out') return null;
+  const parts = raw.split(',').map((s) => s.trim());
+  if (parts.length !== m) return null;
+  const v: Vector = [];
+  for (const p of parts) {
+    const f = parseFrac(p);
+    if (!f) return null;
+    v.push(f);
+  }
+  return v;
+}
 
 export default function ProjectWorkshop() {
   const [source, setSource] = useState<MatrixSource>({
@@ -37,19 +51,38 @@ export default function ProjectWorkshop() {
     id: 'singular',
   });
   const [bMode, setBMode] = useState<BMode>('out');
+  const [customB, setCustomB] = useState<Vector | null>(null);
   const [banner, setBanner] = useState(EMPTY_BANNER);
 
   useEffect(() => {
     setSource(sourceFromParams(clientParam('preset'), clientParam('A')));
-    const b = clientParam('b');
-    if (b === 'in' || b === 'out') setBMode(b);
+    const bq = clientParam('b');
+    if (bq === 'in' || bq === 'out') {
+      setBMode(bq);
+      setCustomB(null);
+    }
     setBanner(clientBannerFromDeepLink());
   }, []);
 
   const A = useMemo(() => sourceMatrix(source), [source]);
   const m = rows(A);
   const n = cols(A);
-  const b = useMemo(() => pickB(A, bMode), [A, bMode]);
+
+  useEffect(() => {
+    const bq = clientParam('b');
+    if (bq && bq !== 'in' && bq !== 'out') {
+      const v = parseBParam(bq, m);
+      if (v) {
+        setCustomB(v);
+        setBMode('custom');
+      }
+    }
+  }, [m]);
+
+  const b = useMemo(() => {
+    if (bMode === 'custom' && customB && customB.length === m) return customB;
+    return pickB(A, bMode === 'custom' ? 'out' : bMode);
+  }, [A, bMode, customB, m]);
   const pr = useMemo(() => project(A, b), [A, b]);
   const fs = useMemo(() => fourSubspaces(A), [A]);
   const label = sourceLabel(source);
@@ -75,6 +108,7 @@ export default function ProjectWorkshop() {
   }, [m, b, pr]);
 
   return (
+    <WorkshopErrorBoundary desk="Project">
     <div className="workshop">
       <header className="workshop__head">
         <h1>Project · least squares</h1>
@@ -125,6 +159,21 @@ export default function ProjectWorkshop() {
         <div style={{ marginTop: '0.75rem' }}>
           <MatrixView A={A} caption={`${label} · ${m}×${n}`} />
         </div>
+        <ShareBar
+          path="/project"
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
+          extra={{
+            b:
+              bMode === 'custom'
+                ? b.map((c) => `${c.n}/${c.d}`.replace(/\/1$/, '')).join(',')
+                : bMode,
+          }}
+        />
+        <SendToBar
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
+        />
       </div>
 
       <div className="panel">
@@ -134,7 +183,10 @@ export default function ProjectWorkshop() {
             type="button"
             className={`tab-btn${bMode === 'in' ? ' is-on' : ''}`}
             aria-pressed={bMode === 'in'}
-            onClick={() => setBMode('in')}
+            onClick={() => {
+              setBMode('in');
+              setCustomB(null);
+            }}
           >
             b ∈ C(A)
           </button>
@@ -142,12 +194,34 @@ export default function ProjectWorkshop() {
             type="button"
             className={`tab-btn${bMode === 'out' ? ' is-on' : ''}`}
             aria-pressed={bMode === 'out'}
-            onClick={() => setBMode('out')}
+            onClick={() => {
+              setBMode('out');
+              setCustomB(null);
+            }}
           >
             b ∉ C(A) (when possible)
           </button>
+          <button
+            type="button"
+            className={`tab-btn${bMode === 'custom' ? ' is-on' : ''}`}
+            aria-pressed={bMode === 'custom'}
+            onClick={() => {
+              setBMode('custom');
+              setCustomB(b.map((c) => ({ n: c.n, d: c.d })));
+            }}
+          >
+            Edit b
+          </button>
         </div>
-        <VectorView v={b} label="b" />
+        <VectorView v={b} label="b (active)" />
+        <VectorEditor
+          vector={b}
+          label="b"
+          onApply={(v) => {
+            setCustomB(v);
+            setBMode('custom');
+          }}
+        />
       </div>
 
       <div className="two-col">
@@ -242,6 +316,7 @@ export default function ProjectWorkshop() {
         </ul>
       </aside>
     </div>
+    </WorkshopErrorBoundary>
   );
 }
 

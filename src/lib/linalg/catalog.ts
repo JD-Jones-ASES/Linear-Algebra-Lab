@@ -183,7 +183,63 @@ export const PRESETS: MatrixPreset[] = [
       [1, 2],
     ],
   ),
-
+  p(
+    'perm',
+    'Permutation',
+    'Swap basis vectors — det = −1, area-preserving reflection flavor.',
+    ['square', 'full-rank'],
+    [
+      [0, 1],
+      [1, 0],
+    ],
+  ),
+  p(
+    'nilpotent',
+    'Nilpotent 2×2',
+    '[[0,1],[0,0]] — only eigenvalue 0; columns nearly collapse.',
+    ['square', 'deficient'],
+    [
+      [0, 1],
+      [0, 0],
+    ],
+  ),
+  p(
+    'projection2',
+    'Projection 2×2',
+    '[[1,0],[0,0]] — projects onto the x₁-axis; det 0.',
+    ['square', 'deficient'],
+    [
+      [1, 0],
+      [0, 0],
+    ],
+  ),
+  p(
+    'area2',
+    'Area demo',
+    '[[2,1],[0,3]] — det = 6; nice parallelogram for the area picture.',
+    ['square', 'full-rank', 'classic'],
+    [
+      [2, 1],
+      [0, 3],
+    ],
+  ),
+  p(
+    'companion',
+    'Companion-ish',
+    '[[0,-2],[1,3]] — char poly related to λ² − 3λ + 2; eigen story.',
+    ['square', 'full-rank'],
+    [
+      [0, -2],
+      [1, 3],
+    ],
+  ),
+  p(
+    'wide-rank1',
+    'Wide rank-1',
+    '1×3 row — one equation, big nullspace (affine line/plane of solutions).',
+    ['wide', 'deficient'],
+    [[1, 2, 3]],
+  ),
 ];
 
 export function presetById(id: string | null | undefined): MatrixPreset | null {

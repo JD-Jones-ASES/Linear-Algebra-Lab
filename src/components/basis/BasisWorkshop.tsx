@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import '../shared/workshop.css';
+import { WorkshopErrorBoundary } from '../shared/WorkshopErrorBoundary';
 import { TourBanner } from '../shared/TourBanner';
 import { TheoremChipRow } from '../shared/TheoremChip';
 import { MatrixView, VectorView } from '../shared/MatrixView';
@@ -17,12 +18,11 @@ import {
 } from '../../lib/linalg/matrixSource';
 import { changeOfBasis } from '../../lib/linalg/changeOfBasis';
 import { gramSchmidtColumns } from '../../lib/linalg/gramSchmidt';
-import { encodeMatrix } from '../../lib/linalg/urlMatrix';
 import { formatFrac } from '../../lib/linalg/frac';
-import { cols, rows } from '../../lib/linalg/matrix';
+import { cols, rows, column } from '../../lib/linalg/matrix';
 import { withBase } from '../../lib/basePath';
 import { AmbientViz } from '../viz/AmbientViz';
-import { column } from '../../lib/linalg/matrix';
+import { ShareBar, SendToBar } from '../shared/ShareBar';
 
 export default function BasisWorkshop() {
   const [source, setSource] = useState<MatrixSource>({
@@ -67,9 +67,9 @@ export default function BasisWorkshop() {
         }))
       : [];
 
-  const shareHref = withBase(`/basis?A=${encodeURIComponent(encodeMatrix(P))}`);
 
   return (
+    <WorkshopErrorBoundary desk="Basis">
     <div className="workshop">
       <header className="workshop__head">
         <h1>Basis · coordinates</h1>
@@ -123,12 +123,15 @@ export default function BasisWorkshop() {
             }
           />
         </div>
-        <p className="panel__meta" style={{ marginTop: '0.5rem' }}>
-          Share:{' '}
-          <a href={shareHref} className="mono">
-            ?A={encodeMatrix(P)}
-          </a>
-        </p>
+        <ShareBar
+          path="/basis"
+          matrix={P}
+          presetId={source.kind === 'preset' ? source.id : null}
+        />
+        <SendToBar
+          matrix={P}
+          presetId={source.kind === 'preset' ? source.id : null}
+        />
       </div>
 
       <div className="two-col">
@@ -242,6 +245,7 @@ export default function BasisWorkshop() {
         </ul>
       </aside>
     </div>
+    </WorkshopErrorBoundary>
   );
 }
 

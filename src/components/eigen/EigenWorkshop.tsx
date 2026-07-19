@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import '../shared/workshop.css';
+import { WorkshopErrorBoundary } from '../shared/WorkshopErrorBoundary';
 import { TourBanner } from '../shared/TourBanner';
 import { TheoremChipRow } from '../shared/TheoremChip';
 import { MatrixView, VectorView } from '../shared/MatrixView';
@@ -15,11 +16,11 @@ import {
   sourceFromParams,
 } from '../../lib/linalg/matrixSource';
 import { eigen } from '../../lib/linalg/eigen';
-import { encodeMatrix } from '../../lib/linalg/urlMatrix';
 import { formatFrac } from '../../lib/linalg/frac';
 import { type Matrix, rows, cols } from '../../lib/linalg/matrix';
 import { withBase } from '../../lib/basePath';
 import { AmbientViz } from '../viz/AmbientViz';
+import { ShareBar, SendToBar } from '../shared/ShareBar';
 
 const EIGEN_PRESETS = [
   'eigen-diag',
@@ -64,6 +65,7 @@ export default function EigenWorkshop() {
       : [];
 
   return (
+    <WorkshopErrorBoundary desk="Eigen">
     <div className="workshop">
       <header className="workshop__head">
         <h1>Eigen</h1>
@@ -115,15 +117,15 @@ export default function EigenWorkshop() {
         ) : (
           <MatrixView A={A} caption={`A · ${label}`} />
         )}
-        <p className="panel__meta">
-          Share:{' '}
-          <a
-            href={withBase(`/eigen?A=${encodeURIComponent(encodeMatrix(A))}`)}
-            className="mono"
-          >
-            ?A={encodeMatrix(A)}
-          </a>
-        </p>
+        <ShareBar
+          path="/eigen"
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
+        />
+        <SendToBar
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
+        />
       </div>
 
       {square ? (
@@ -198,6 +200,7 @@ export default function EigenWorkshop() {
         </ul>
       </aside>
     </div>
+    </WorkshopErrorBoundary>
   );
 }
 

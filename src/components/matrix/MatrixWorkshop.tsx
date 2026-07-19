@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import '../shared/workshop.css';
+import { WorkshopErrorBoundary } from '../shared/WorkshopErrorBoundary';
 import { TourBanner } from '../shared/TourBanner';
 import { TheoremChipRow } from '../shared/TheoremChip';
 import { MatrixView } from '../shared/MatrixView';
 import { MatrixEditor } from '../shared/MatrixEditor';
+import { ShareBar, SendToBar } from '../shared/ShareBar';
 import { clientBannerFromDeepLink, clientParam, EMPTY_BANNER } from '../../lib/connect/deepLink';
 import { theoremsForRoom } from '../../lib/connect/theorems';
 import {
   PRESETS,
-  presetById,
   defaultPreset,
   type MatrixSource,
   sourceMatrix,
@@ -17,11 +18,11 @@ import {
   sourceFromParams,
 } from '../../lib/linalg/matrixSource';
 import { fourSubspaces } from '../../lib/linalg/subspaces';
-import { det, cols, rows, type Matrix } from '../../lib/linalg/matrix';
+import { det, cols, rows, type Matrix, column } from '../../lib/linalg/matrix';
 import { formatFrac, isZero } from '../../lib/linalg/frac';
 import { withBase } from '../../lib/basePath';
 import { AmbientViz } from '../viz/AmbientViz';
-import { column } from '../../lib/linalg/matrix';
+import { DetArea2D, DetVolumeNote } from '../viz/DetArea2D';
 
 type Tab = 'A' | 'rref' | 'both';
 
@@ -64,6 +65,7 @@ export default function MatrixWorkshop() {
   }, [A]);
 
   return (
+    <WorkshopErrorBoundary desk="Matrix">
     <div className="workshop">
       <header className="workshop__head">
         <h1>Matrix desk</h1>
@@ -111,6 +113,16 @@ export default function MatrixWorkshop() {
               : () => pickPreset(defaultPreset().id)
           }
           resetLabel={source.kind === 'preset' ? 'Reset preset' : 'Load Strang 2×3'}
+        />
+        <ShareBar
+          path="/matrix"
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
+          extra={tab !== 'both' ? { tab } : {}}
+        />
+        <SendToBar
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
         />
       </div>
 
@@ -210,6 +222,19 @@ export default function MatrixWorkshop() {
         ) : null}
       </div>
 
+      {d !== null && rows(A) === 2 && cols(A) === 2 ? (
+        <div className="panel">
+          <h2 className="panel__title">Determinant as area</h2>
+          <DetArea2D A={A} det={d} />
+        </div>
+      ) : null}
+      {d !== null && rows(A) === 3 && cols(A) === 3 ? (
+        <div className="panel">
+          <h2 className="panel__title">Determinant as volume</h2>
+          <DetVolumeNote det={d} n={3} />
+        </div>
+      ) : null}
+
       <aside className="continue-card">
         <h2>Where next</h2>
         <ul>
@@ -246,5 +271,6 @@ export default function MatrixWorkshop() {
         </ul>
       </aside>
     </div>
+    </WorkshopErrorBoundary>
   );
 }

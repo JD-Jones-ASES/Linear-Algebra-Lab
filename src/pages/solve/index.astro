@@ -2,11 +2,6 @@
 import Layout from '../../layouts/Layout.astro';
 import SolveWorkshop from '../../components/solve/SolveWorkshop';
 ---
-
-<Layout
-  path="/solve"
-  title="Solve"
-  description="Solve Ax = b over rationals — consistency via column space, particular solution, nullspace."
->
+<Layout path="/solve" title="Solve" description="Solve Ax = b over rationals with editable b and affine solutions.">
   <SolveWorkshop client:load />
 </Layout>

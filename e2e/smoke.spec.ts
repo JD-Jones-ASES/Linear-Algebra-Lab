@@ -168,3 +168,27 @@ test('affine theorem deep link lands on solve', async ({ page }) => {
   await expect(page.getByText('consistent', { exact: true }).first()).toBeVisible();
   await expect(page.getByText(/affine solution set/i).first()).toBeVisible();
 });
+
+
+test('det area demo preset shows parallelogram', async ({ page }) => {
+  await page.goto('/matrix?preset=area2');
+  await expect(page.locator('[data-det-area="true"]')).toBeVisible();
+  await expect(page.getByText(/det A =/i).first()).toBeVisible();
+});
+
+test('editable b on solve', async ({ page }) => {
+  await page.goto('/solve?preset=id2&b=in');
+  await expect(page.locator('[data-vector-editor="true"]')).toBeVisible();
+  await expect(page.locator('[data-editor-ready="true"]').first()).toBeVisible();
+  const ed = page.locator('[data-vector-editor="true"]');
+  await ed.getByLabel('b entry 1').fill('3');
+  await ed.getByLabel('b entry 2').fill('4');
+  await ed.getByRole('button', { name: /apply b/i }).click();
+  await expect(page.getByText('consistent', { exact: true }).first()).toBeVisible();
+});
+
+test('share bar present on matrix', async ({ page }) => {
+  await page.goto('/matrix?preset=strang');
+  await expect(page.locator('[data-share-bar="true"]')).toBeVisible();
+  await expect(page.getByRole('button', { name: /copy link/i })).toBeVisible();
+});

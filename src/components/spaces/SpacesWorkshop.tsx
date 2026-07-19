@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import '../shared/workshop.css';
+import { WorkshopErrorBoundary } from '../shared/WorkshopErrorBoundary';
 import { TourBanner } from '../shared/TourBanner';
 import { TheoremChipRow } from '../shared/TheoremChip';
 import { MatrixView, VectorView } from '../shared/MatrixView';
 import { MatrixEditor } from '../shared/MatrixEditor';
+import { ShareBar, SendToBar } from '../shared/ShareBar';
 import { clientBannerFromDeepLink, clientParam, EMPTY_BANNER } from '../../lib/connect/deepLink';
 import { theoremsForRoom } from '../../lib/connect/theorems';
 import {
@@ -80,6 +82,7 @@ export default function SpacesWorkshop() {
   }, [fs]);
 
   return (
+    <WorkshopErrorBoundary desk="Spaces">
     <div className="workshop">
       <header className="workshop__head">
         <h1>Four fundamental subspaces</h1>
@@ -127,6 +130,15 @@ export default function SpacesWorkshop() {
               id: source.kind === 'preset' ? source.id : defaultPreset().id,
             })
           }
+        />
+        <ShareBar
+          path="/spaces"
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
+        />
+        <SendToBar
+          matrix={A}
+          presetId={source.kind === 'preset' ? source.id : null}
         />
       </div>
 
@@ -266,6 +278,7 @@ export default function SpacesWorkshop() {
         </ul>
       </aside>
     </div>
+    </WorkshopErrorBoundary>
   );
 }
 
