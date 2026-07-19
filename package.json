@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.3.2",
   "private": true,
-  "description": "Interactive linear algebra desk \u2014 four subspaces, projections, basis, eigen, 2D/3D viz",
+  "description": "Interactive linear algebra desk — four subspaces, projections, basis, eigen, 2D/3D viz",
   "license": "MIT",
   "author": "JD Jones",
   "engines": {
@@ -14,7 +14,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "astro sync && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
