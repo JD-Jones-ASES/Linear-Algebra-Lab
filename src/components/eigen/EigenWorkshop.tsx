@@ -4,7 +4,7 @@ import { TourBanner } from '../shared/TourBanner';
 import { TheoremChipRow } from '../shared/TheoremChip';
 import { MatrixView, VectorView } from '../shared/MatrixView';
 import { MatrixEditor } from '../shared/MatrixEditor';
-import { clientBannerFromDeepLink, clientParam } from '../../lib/connect/deepLink';
+import { clientBannerFromDeepLink, clientParam, EMPTY_BANNER } from '../../lib/connect/deepLink';
 import { theoremsForRoom } from '../../lib/connect/theorems';
 import {
   PRESETS,
@@ -37,7 +37,7 @@ export default function EigenWorkshop() {
     kind: 'preset',
     id: 'eigen-sym',
   });
-  const [banner, setBanner] = useState(clientBannerFromDeepLink());
+  const [banner, setBanner] = useState(EMPTY_BANNER);
 
   useEffect(() => {
     setSource(sourceFromParams(clientParam('preset'), clientParam('A')));

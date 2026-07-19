@@ -148,3 +148,14 @@ test('url matrix deep link loads', async ({ page }) => {
   await expect(page.locator('[data-rank]')).toHaveAttribute('data-rank', '2');
   await expect(page.getByText(/URL matrix|Custom/i).first()).toBeVisible();
 });
+
+
+test('affine theorem deep link lands on solve', async ({ page }) => {
+  await page.goto(
+    '/solve?preset=strang&b=in&thm=affine-solution&note=' +
+      encodeURIComponent('Underdetermined: line of solutions.'),
+  );
+  await expect(page.getByRole('heading', { name: /solve a x = b/i })).toBeVisible();
+  await expect(page.getByText('consistent', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText(/affine solution set/i).first()).toBeVisible();
+});

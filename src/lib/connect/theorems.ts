@@ -179,8 +179,6 @@ export const THEOREMS: NamedTheorem[] = [
       },
     ],
   },
-,
-
   {
     id: 'change-of-basis',
     name: 'Change of basis',
@@ -260,11 +258,11 @@ export const THEOREMS: NamedTheorem[] = [
 
 export function theoremById(id: string | null | undefined): NamedTheorem | null {
   if (!id) return null;
-  return THEOREMS.find((t) => t.id === id) ?? null;
+  return THEOREMS.find((t) => t && t.id === id) ?? null;
 }
 
 export function theoremsForRoom(
   room: NamedTheorem['rooms'][number],
 ): NamedTheorem[] {
-  return THEOREMS.filter((t) => t.rooms.includes(room));
+  return THEOREMS.filter((t) => t && t.rooms.includes(room));
 }
